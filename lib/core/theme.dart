@@ -40,7 +40,7 @@ class AppTheme {
         backgroundColor: surface,
         foregroundColor: primary,
         elevation: 0,
-        centerTitle: true,
+        centerTitle: false,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(

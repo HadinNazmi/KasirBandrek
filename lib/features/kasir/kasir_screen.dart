@@ -123,18 +123,36 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        centerTitle: false,
+        titleSpacing: 16,
         title: const Text('Kedai Bandrek', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.admin_panel_settings_outlined),
-            tooltip: 'Mode Admin',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const PinGateScreen()),
-              );
-            },
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 9),
+            child: TextButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PinGateScreen()),
+                );
+              },
+              icon: const Icon(Icons.lock_outline, size: 16, color: AppTheme.primary),
+              label: const Text(
+                'Login',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: AppTheme.primary,
+                ),
+              ),
+              style: TextButton.styleFrom(
+                backgroundColor: AppTheme.tertiary,
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+            ),
           ),
+          const SizedBox(width: 4),
           // Indikator Online/Offline & Belum Terkirim (Tap untuk sync)
           InkWell(
             onTap: () {
