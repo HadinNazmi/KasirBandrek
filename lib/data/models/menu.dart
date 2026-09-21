@@ -4,6 +4,7 @@ class Menu {
   final String nama;
   final int harga;
   final bool aktif;
+  final String? fotoUrl;
 
   Menu({
     required this.id,
@@ -11,6 +12,7 @@ class Menu {
     required this.nama,
     required this.harga,
     required this.aktif,
+    this.fotoUrl,
   });
 
   factory Menu.fromJson(Map<String, dynamic> json) {
@@ -18,8 +20,9 @@ class Menu {
       id: json['id'] as String,
       kategoriId: json['kategori_id'] as String?,
       nama: json['nama'] as String,
-      harga: json['harga'] as int,
+      harga: (json['harga'] as num).toInt(),
       aktif: json['aktif'] as bool? ?? true,
+      fotoUrl: json['foto_url'] as String?,
     );
   }
 
@@ -30,6 +33,7 @@ class Menu {
       'nama': nama,
       'harga': harga,
       'aktif': aktif,
+      'foto_url': fotoUrl,
     };
   }
 }

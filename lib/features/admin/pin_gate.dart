@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/network_info.dart';
 import '../../providers/admin_provider.dart';
 import '../../providers/supabase_provider.dart';
+import '../kasir/kasir_layout.dart';
 import 'admin_layout.dart';
 
 class PinGateScreen extends ConsumerStatefulWidget {
@@ -151,41 +152,58 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4EBE3),
-      body: SafeArea(
-        child: Center(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 480),
-            color: const Color(0xFFFAF1E8),
-            child: Column(
-              children: [
-                // Top Navigation Bar
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Back Button
-                      InkWell(
-                        onTap: () => Navigator.pop(context),
-                        borderRadius: BorderRadius.circular(24),
-                        child: Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: const Color(0xFFEBDCD0)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF5C351E).withValues(alpha: 0.08),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
+      body: PopScope(
+        canPop: true,
+        onPopInvokedWithResult: (didPop, result) {
+          if (!didPop) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const KasirLayout()),
+            );
+          }
+        },
+        child: SafeArea(
+          child: Center(
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 480),
+              color: const Color(0xFFFAF1E8),
+              child: Column(
+                children: [
+                  // Top Navigation Bar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Back Button
+                        InkWell(
+                          onTap: () {
+                            if (Navigator.canPop(context)) {
+                              Navigator.pop(context);
+                            } else {
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(builder: (_) => const KasirLayout()),
+                              );
+                            }
+                          },
+                          borderRadius: BorderRadius.circular(24),
+                          child: Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: const Color(0xFFEBDCD0)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF5C351E).withValues(alpha: 0.08),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(Icons.arrow_back_ios_new, size: 18, color: Color(0xFF2D1F17)),
                           ),
-                          child: const Icon(Icons.arrow_back_ios_new, size: 18, color: Color(0xFF2D1F17)),
                         ),
-                      ),
                       // Status Badge
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -548,8 +566,9 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildKey(String digit, String sub) {
     final disabled = _isLoading || _isLocked;

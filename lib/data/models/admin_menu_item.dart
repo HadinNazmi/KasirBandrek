@@ -3,6 +3,7 @@ class AdminMenuItem {
   final String nama;
   final int harga;
   final bool aktif;
+  final String? fotoUrl;
   final String? kategoriId;
   final String? kategoriNama;
 
@@ -11,6 +12,7 @@ class AdminMenuItem {
     required this.nama,
     required this.harga,
     required this.aktif,
+    this.fotoUrl,
     this.kategoriId,
     this.kategoriNama,
   });
@@ -21,6 +23,7 @@ class AdminMenuItem {
       nama: json['nama'] as String,
       harga: (json['harga'] as num).toInt(),
       aktif: json['aktif'] as bool? ?? true,
+      fotoUrl: json['foto_url'] as String?,
       kategoriId: json['kategori_id'] as String?,
       kategoriNama: json['kategori_nama'] as String?,
     );
@@ -32,6 +35,7 @@ class AdminMenuItem {
       'nama': nama,
       'harga': harga,
       'aktif': aktif,
+      'foto_url': fotoUrl,
       'kategori_id': kategoriId,
       'kategori_nama': kategoriNama,
     };
@@ -42,6 +46,7 @@ class AdminMenuItem {
     String? nama,
     int? harga,
     bool? aktif,
+    String? fotoUrl,
     String? kategoriId,
     String? kategoriNama,
   }) {
@@ -50,6 +55,7 @@ class AdminMenuItem {
       nama: nama ?? this.nama,
       harga: harga ?? this.harga,
       aktif: aktif ?? this.aktif,
+      fotoUrl: fotoUrl ?? this.fotoUrl,
       kategoriId: kategoriId ?? this.kategoriId,
       kategoriNama: kategoriNama ?? this.kategoriNama,
     );

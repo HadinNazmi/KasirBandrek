@@ -236,7 +236,7 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
                         padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          childAspectRatio: 1.0,
+                          childAspectRatio: 0.82,
                           crossAxisSpacing: 12,
                           mainAxisSpacing: 12,
                         ),
@@ -372,26 +372,63 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
   Widget _buildMenuCard(Menu menu) {
     return Card(
       clipBehavior: Clip.antiAlias,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: () => ref.read(cartProvider.notifier).addMenu(menu),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                menu.nama,
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Foto menu
+            Expanded(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  if (menu.fotoUrl != null && menu.fotoUrl!.isNotEmpty)
+                    Image.network(
+                      menu.fotoUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (ctx, err, stack) => _buildPlaceholderPhoto(),
+                    )
+                  else
+                    _buildPlaceholderPhoto(),
+                ],
               ),
-              Text(
-                AppFormat.currency(menu.harga),
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppTheme.primary),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    menu.nama,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    AppFormat.currency(menu.harga),
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.primary),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderPhoto() {
+    return Container(
+      color: const Color(0xFFF7EDE3),
+      child: const Center(
+        child: Icon(
+          Icons.restaurant_menu_rounded,
+          color: Color(0xFFC7A896),
+          size: 36,
         ),
       ),
     );

@@ -225,14 +225,33 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          AppFormat.currency(t.total),
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: isBatal ? Colors.grey : AppTheme.primary,
-                            decoration: isBatal ? TextDecoration.lineThrough : null,
-                          ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              AppFormat.currency(t.total),
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: isBatal ? Colors.grey : AppTheme.primary,
+                                decoration: isBatal ? TextDecoration.lineThrough : null,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            InkWell(
+                              onTap: () => Navigator.pop(context),
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                width: 30,
+                                height: 30,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFFF6ECE3),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.close, size: 16, color: Color(0xFF52443D)),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

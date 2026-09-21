@@ -69,6 +69,7 @@ class RiwayatTab extends ConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF9EFE6),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Riwayat Penjualan', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,

@@ -35,9 +35,17 @@ class _AdminLayoutState extends ConsumerState<AdminLayout> {
       }
     });
 
-    return Center(
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 480),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (_currentIndex != 0) {
+          setState(() => _currentIndex = 0);
+        }
+      },
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 480),
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
           boxShadow: [
@@ -95,6 +103,7 @@ class _AdminLayoutState extends ConsumerState<AdminLayout> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

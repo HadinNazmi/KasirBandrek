@@ -255,6 +255,20 @@ class HariIniTab extends ConsumerWidget {
                   const Spacer(),
                   Text(AppFormat.currency(t.total),
                       style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppTheme.primary)),
+                  const SizedBox(width: 12),
+                  InkWell(
+                    onTap: () => Navigator.pop(ctx),
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF6ECE3),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.close, size: 16, color: Color(0xFF52443D)),
+                    ),
+                  ),
                 ]),
               ),
               const Divider(height: 20),

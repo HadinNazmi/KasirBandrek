@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../../core/network_info.dart';
 import '../../../../core/theme.dart';
 import '../../../../data/models/admin_menu_item.dart';
@@ -12,8 +13,9 @@ import '../../pin_gate.dart';
 
 class MenuFormSheet extends ConsumerStatefulWidget {
   final AdminMenuItem? menuItem;
+  final String? defaultKategoriId;
 
-  const MenuFormSheet({super.key, this.menuItem});
+  const MenuFormSheet({super.key, this.menuItem, this.defaultKategoriId});
 
   @override
   ConsumerState<MenuFormSheet> createState() => _MenuFormSheetState();
@@ -27,6 +29,11 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
   bool _isLoading = false;
   String? _errorMessage;
 
+  Uint8List? _imageBytes;
+  String? _imageExtension;
+  String? _currentFotoUrl;
+  bool _removeFoto = false;
+
   bool get _isEdit => widget.menuItem != null;
 
   @override
@@ -36,8 +43,9 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
     _hargaController = TextEditingController(
       text: widget.menuItem != null ? widget.menuItem!.harga.toString() : '',
     );
-    _selectedKategoriId = widget.menuItem?.kategoriId;
+    _selectedKategoriId = widget.menuItem?.kategoriId ?? widget.defaultKategoriId;
     _isAktif = widget.menuItem?.aktif ?? true;
+    _currentFotoUrl = widget.menuItem?.fotoUrl;
   }
 
   @override
@@ -45,6 +53,64 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
     _namaController.dispose();
     _hargaController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(
+        source: source,
+        imageQuality: 80,
+        maxWidth: 1024,
+        maxHeight: 1024,
+      );
+      if (picked != null) {
+        final bytes = await picked.readAsBytes();
+        final ext = picked.name.split('.').last;
+        setState(() {
+          _imageBytes = bytes;
+          _imageExtension = ext;
+          _removeFoto = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal memilih gambar: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  void _showImageSourceDialog() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined, color: AppTheme.primary),
+              title: const Text('Pilih dari Galeri'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined, color: AppTheme.primary),
+              title: const Text('Ambil Foto Kamera'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _simpan() async {
@@ -87,6 +153,17 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
 
     try {
       final svc = ref.read(supabaseServiceProvider);
+
+      String? finalFotoUrl = _currentFotoUrl;
+      if (_imageBytes != null && _imageExtension != null) {
+        finalFotoUrl = await svc.uploadFotoMenu(
+          bytes: _imageBytes!,
+          fileExtension: _imageExtension!,
+        );
+      } else if (_removeFoto) {
+        finalFotoUrl = null;
+      }
+
       await svc.adminSimpanMenu(
         token: token,
         id: widget.menuItem?.id,
@@ -94,6 +171,7 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
         harga: harga,
         kategoriId: _selectedKategoriId!,
         aktif: _isAktif,
+        fotoUrl: finalFotoUrl,
       );
 
       // Invalidate providers so Kasir & Admin update immediately
@@ -244,6 +322,123 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                 ),
                 const SizedBox(height: 16),
               ],
+
+              // Foto Menu
+              const Text(
+                'FOTO MENU',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.8,
+                  color: Color(0xFF6E5A4F),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFCF5EE),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFEBDCD0)),
+                ),
+                child: Row(
+                  children: [
+                    // Preview Foto
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        width: 72,
+                        height: 72,
+                        color: const Color(0xFFF3E7DC),
+                        child: _imageBytes != null
+                            ? Image.memory(
+                                _imageBytes!,
+                                width: 72,
+                                height: 72,
+                                fit: BoxFit.cover,
+                              )
+                            : (_currentFotoUrl != null && !_removeFoto)
+                                ? Image.network(
+                                    _currentFotoUrl!,
+                                    width: 72,
+                                    height: 72,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (ctx, err, stack) => const Icon(
+                                      Icons.broken_image_outlined,
+                                      color: Colors.grey,
+                                      size: 32,
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.restaurant_menu,
+                                    color: Color(0xFFA68B7C),
+                                    size: 32,
+                                  ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    // Action Buttons
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: _isLoading ? null : _showImageSourceDialog,
+                            icon: Icon(
+                              (_imageBytes != null || (_currentFotoUrl != null && !_removeFoto))
+                                  ? Icons.change_circle_outlined
+                                  : Icons.add_photo_alternate_outlined,
+                              size: 16,
+                            ),
+                            label: Text(
+                              (_imageBytes != null || (_currentFotoUrl != null && !_removeFoto))
+                                  ? 'Ganti Foto'
+                                  : 'Pilih Foto',
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.primary,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              minimumSize: const Size(0, 34),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                          ),
+                          if (_imageBytes != null || (_currentFotoUrl != null && !_removeFoto)) ...[
+                            const SizedBox(height: 6),
+                            InkWell(
+                              onTap: _isLoading
+                                  ? null
+                                  : () {
+                                      setState(() {
+                                        _imageBytes = null;
+                                        _imageExtension = null;
+                                        _currentFotoUrl = null;
+                                        _removeFoto = true;
+                                      });
+                                    },
+                              borderRadius: BorderRadius.circular(6),
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                                child: Text(
+                                  'Hapus Foto',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
 
               // Nama Menu Input
               const Text(

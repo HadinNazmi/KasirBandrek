@@ -1,4 +1,6 @@
+import 'dart:typed_data';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 import 'models/admin_menu_item.dart';
 import 'models/admin_ringkasan.dart';
 import 'models/transaksi.dart';
@@ -139,6 +141,7 @@ class SupabaseService {
     required int harga,
     required String kategoriId,
     required bool aktif,
+    String? fotoUrl,
   }) async {
     final response = await _client.rpc('admin_simpan_menu', params: {
       'p_token': token,
@@ -147,8 +150,43 @@ class SupabaseService {
       'p_harga': harga,
       'p_kategori_id': kategoriId,
       'p_aktif': aktif,
+      'p_foto_url': fotoUrl,
     });
     return response as Map<String, dynamic>;
+  }
+
+  Future<void> adminHapusMenu({
+    required String token,
+    required String id,
+  }) async {
+    await _client.rpc('admin_hapus_menu', params: {
+      'p_token': token,
+      'p_id': id,
+    });
+  }
+
+  Future<String> uploadFotoMenu({
+    required Uint8List bytes,
+    required String fileExtension,
+  }) async {
+    final cleanExt = fileExtension.replaceAll('.', '').toLowerCase();
+    final fileName = '${DateTime.now().millisecondsSinceEpoch}_${const Uuid().v4().substring(0, 8)}.$cleanExt';
+    final path = 'menus/$fileName';
+    final contentType = cleanExt == 'png'
+        ? 'image/png'
+        : cleanExt == 'webp'
+            ? 'image/webp'
+            : 'image/jpeg';
+
+    await _client.storage.from('menu-foto').uploadBinary(
+      path,
+      bytes,
+      fileOptions: FileOptions(
+        contentType: contentType,
+        upsert: true,
+      ),
+    );
+    return _client.storage.from('menu-foto').getPublicUrl(path);
   }
 
   Future<Map<String, dynamic>> adminSimpanKategori({
