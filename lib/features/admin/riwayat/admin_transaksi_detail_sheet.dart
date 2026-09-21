@@ -4,6 +4,8 @@ import '../../../core/format.dart';
 import '../../../core/network_info.dart';
 import '../../../core/theme.dart';
 import '../../../data/models/transaksi.dart';
+import '../../../providers/admin_laporan_provider.dart';
+import '../../../providers/admin_log_provider.dart';
 import '../../../providers/admin_provider.dart';
 import '../../../providers/hari_ini_provider.dart';
 import '../../../providers/supabase_provider.dart';
@@ -45,7 +47,7 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
     if (!mounted) return;
     Navigator.pop(context);
 
-    await showModalBottomSheet<bool>(
+    final result = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -57,6 +59,14 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
         initialMetode: widget.transaksi.metodeBayar,
       ),
     );
+
+    if (result == true) {
+      ref.invalidate(adminRiwayatProvider);
+      ref.invalidate(adminRingkasanProvider);
+      ref.invalidate(adminLaporanProvider);
+      ref.invalidate(adminLogAktivitasProvider);
+      ref.invalidate(hariIniProvider);
+    }
   }
 
   void _batalkan() async {
@@ -115,6 +125,8 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
 
       ref.invalidate(adminRiwayatProvider);
       ref.invalidate(adminRingkasanProvider);
+      ref.invalidate(adminLaporanProvider);
+      ref.invalidate(adminLogAktivitasProvider);
       ref.invalidate(hariIniProvider);
 
       if (mounted) {

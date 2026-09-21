@@ -1,8 +1,11 @@
 import 'dart:typed_data';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+import '../core/format.dart';
 import 'models/admin_menu_item.dart';
 import 'models/admin_ringkasan.dart';
+import 'models/laporan_penjualan.dart';
+import 'models/log_aktivitas_item.dart';
 import 'models/transaksi.dart';
 import 'models/transaksi_item.dart';
 
@@ -212,5 +215,38 @@ class SupabaseService {
       'p_token': token,
       'p_id': id,
     });
+  }
+
+  // =====================================================================
+  // LAPORAN & LOG AKTIVITAS (MEETING 1)
+  // =====================================================================
+
+  Future<LaporanPenjualan> adminLaporanPenjualan({
+    required String token,
+    DateTime? dari,
+    DateTime? sampai,
+  }) async {
+    final response = await _client.rpc('admin_laporan_penjualan', params: {
+      'p_token': token,
+      'p_dari': dari != null ? AppFormat.dateSql(dari) : null,
+      'p_sampai': sampai != null ? AppFormat.dateSql(sampai) : null,
+    });
+    return LaporanPenjualan.fromJson(response as Map<String, dynamic>);
+  }
+
+  Future<List<LogAktivitasItem>> adminLogAktivitas({
+    required String token,
+    int limit = 100,
+    int offset = 0,
+    String? tipe,
+  }) async {
+    final response = await _client.rpc('admin_log_aktivitas', params: {
+      'p_token': token,
+      'p_limit': limit,
+      'p_offset': offset,
+      'p_tipe': (tipe != null && tipe.isNotEmpty) ? tipe : null,
+    });
+    final List list = response as List;
+    return list.map((e) => LogAktivitasItem.fromJson(e as Map<String, dynamic>)).toList();
   }
 }

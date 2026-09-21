@@ -21,4 +21,9 @@ class AppFormat {
   static String date(DateTime date) {
     return _onlyDateFormat.format(date);
   }
+
+  static final _sqlDateFormat = DateFormat('yyyy-MM-dd');
+  static String dateSql(DateTime date) {
+    return _sqlDateFormat.format(date);
+  }
 }

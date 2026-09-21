@@ -27,7 +27,7 @@ class Transaksi {
     return Transaksi(
       id: json['id'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
-      total: json['total'] as int,
+      total: (json['total'] as num).toInt(),
       metodeBayar: json['metode_bayar'] as String,
       status: json['status'] as String,
       dibatalkanAt: json['dibatalkan_at'] != null ? DateTime.parse(json['dibatalkan_at'] as String) : null,

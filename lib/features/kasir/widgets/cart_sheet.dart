@@ -4,6 +4,8 @@ import '../../../core/format.dart';
 import '../../../core/theme.dart';
 import '../../../data/models/transaksi_item.dart';
 import '../../../data/transaksi_repository.dart';
+import '../../../providers/admin_laporan_provider.dart';
+import '../../../providers/admin_log_provider.dart';
 import '../../../providers/admin_provider.dart';
 import '../../../providers/cart_provider.dart';
 import '../../../providers/hari_ini_provider.dart';
@@ -131,6 +133,8 @@ class _CartSheetState extends ConsumerState<CartSheet> {
           }
         }
         ref.invalidate(hariIniProvider);
+        ref.invalidate(adminLaporanProvider);
+        ref.invalidate(adminLogAktivitasProvider);
         if (mounted) {
           Navigator.pop(context, true);
           ScaffoldMessenger.of(context).showSnackBar(
@@ -142,6 +146,8 @@ class _CartSheetState extends ConsumerState<CartSheet> {
         await repo.simpan(metode: _metodeBayar, items: itemsToSave);
         ref.read(cartProvider.notifier).clear();
         ref.invalidate(hariIniProvider);
+        ref.invalidate(adminLaporanProvider);
+        ref.invalidate(adminLogAktivitasProvider);
         if (mounted) {
           Navigator.pop(context, 'saved');
         }

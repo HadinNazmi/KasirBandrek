@@ -1,19 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../../../core/format.dart';
 import '../../../core/theme.dart';
+import '../../../data/models/laporan_penjualan.dart';
 import '../../../data/models/transaksi.dart';
+import '../../../providers/admin_laporan_provider.dart';
+import '../../../providers/admin_log_provider.dart';
 import '../../../providers/admin_provider.dart';
 import '../pin_gate.dart';
 import 'admin_transaksi_detail_sheet.dart';
+import 'widgets/tren_penjualan_chart.dart';
 
 class RiwayatTab extends ConsumerWidget {
   const RiwayatTab({super.key});
 
-  void _pilihTanggal(BuildContext context, WidgetRef ref, DateTime currentDate) async {
-    final picked = await showDatePicker(
+  void _pilihRentang(BuildContext context, WidgetRef ref) async {
+    final filter = ref.read(adminLaporanFilterProvider);
+    final now = DateTime.now();
+    final initialRange = DateTimeRange(
+      start: filter.dari ?? now.subtract(const Duration(days: 7)),
+      end: filter.sampai ?? now,
+    );
+
+    final picked = await showDateRangePicker(
       context: context,
-      initialDate: currentDate,
+      initialDateRange: initialRange,
       firstDate: DateTime(2020),
       lastDate: DateTime.now().add(const Duration(days: 365)),
       builder: (context, child) {
@@ -32,12 +44,16 @@ class RiwayatTab extends ConsumerWidget {
     );
 
     if (picked != null) {
-      ref.read(adminSelectedDateProvider.notifier).setDate(picked);
+      ref.read(adminLaporanFilterProvider.notifier).setCustomRange(
+            picked.start,
+            picked.end,
+          );
     }
   }
 
   void _checkSession(BuildContext context, Object error, WidgetRef ref) {
-    if (error is SessionExpiredException || error.toString().contains('SESI_TIDAK_VALID')) {
+    if (error is SessionExpiredException ||
+        error.toString().contains('SESI_TIDAK_VALID')) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(adminTokenProvider.notifier).clearToken();
         Navigator.of(context).pushAndRemoveUntil(
@@ -46,7 +62,8 @@ class RiwayatTab extends ConsumerWidget {
         );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Sesi admin telah berakhir. Silakan masukkan PIN kembali.'),
+            content:
+                Text('Sesi admin telah berakhir. Silakan masukkan PIN kembali.'),
             backgroundColor: Colors.red,
           ),
         );
@@ -54,185 +71,255 @@ class RiwayatTab extends ConsumerWidget {
     }
   }
 
+  String _formatPeriodeText(LaporanFilterState filter) {
+    switch (filter.preset) {
+      case LaporanPreset.hariIni:
+        return 'Hari Ini (${filter.dari != null ? DateFormat('d MMMM yyyy', 'id_ID').format(filter.dari!) : ''})';
+      case LaporanPreset.tujuhHari:
+        return '7 Hari Terakhir (${_formatDateRange(filter.dari, filter.sampai)})';
+      case LaporanPreset.bulanIni:
+        return 'Bulan Ini (${_formatDateRange(filter.dari, filter.sampai)})';
+      case LaporanPreset.tahunIni:
+        return 'Tahun Ini (${_formatDateRange(filter.dari, filter.sampai)})';
+      case LaporanPreset.semua:
+        return 'Semua Waktu (All-Time)';
+      case LaporanPreset.custom:
+        return 'Rentang: ${_formatDateRange(filter.dari, filter.sampai)}';
+    }
+  }
+
+  String _formatDateRange(DateTime? dari, DateTime? sampai) {
+    if (dari == null || sampai == null) return '';
+    final fmt = DateFormat('d MMM yyyy', 'id_ID');
+    return '${fmt.format(dari)} - ${fmt.format(sampai)}';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedDate = ref.watch(adminSelectedDateProvider);
-    final ringkasanAsync = ref.watch(adminRingkasanProvider);
-    final riwayatAsync = ref.watch(adminRiwayatProvider);
+    final filter = ref.watch(adminLaporanFilterProvider);
+    final laporanAsync = ref.watch(adminLaporanProvider);
 
     // Watch for session expiration
-    ringkasanAsync.whenOrNull(error: (e, _) => _checkSession(context, e, ref));
-    riwayatAsync.whenOrNull(error: (e, _) => _checkSession(context, e, ref));
-
-    final isToday = DateUtils.isSameDay(selectedDate, DateTime.now());
+    laporanAsync.whenOrNull(error: (e, _) => _checkSession(context, e, ref));
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9EFE6),
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Riwayat Penjualan', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Riwayat & Laporan',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
-          // Filter Tanggal Button
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: TextButton.icon(
-              onPressed: () => _pilihTanggal(context, ref, selectedDate),
-              icon: const Icon(Icons.calendar_today, size: 16, color: AppTheme.primary),
-              label: Text(
-                isToday ? 'Hari Ini' : AppFormat.date(selectedDate),
-                style: const TextStyle(
-                  color: AppTheme.primary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                ),
-              ),
-              style: TextButton.styleFrom(
-                backgroundColor: const Color(0xFFFEE5D4),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              ),
-            ),
+          IconButton(
+            tooltip: 'Pilih Rentang Tanggal',
+            onPressed: () => _pilihRentang(context, ref),
+            icon: const Icon(Icons.date_range, color: AppTheme.primary),
           ),
         ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          ref.invalidate(adminRingkasanProvider);
-          ref.invalidate(adminRiwayatProvider);
+          ref.invalidate(adminLaporanProvider);
+          ref.invalidate(adminLogAktivitasProvider);
         },
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            // Ringkasan Section
+            // Filter Presets Bar
             SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                child: ringkasanAsync.when(
-                  data: (ringkasan) => _buildSummaryCard(ringkasan),
-                  loading: () => Container(
-                    height: 140,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Center(child: CircularProgressIndicator()),
-                  ),
-                  error: (err, _) => Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Gagal memuat ringkasan: ${err.toString().replaceAll('Exception:', '').trim()}',
-                        style: const TextStyle(color: Colors.red, fontSize: 12),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // Section Header
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Container(
+                color: Colors.white,
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Daftar Transaksi',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2D1F17),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: LaporanPreset.values.map((preset) {
+                          final isSelected = filter.preset == preset;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: FilterChip(
+                              label: Text(preset.label),
+                              selected: isSelected,
+                              showCheckmark: false,
+                              selectedColor: AppTheme.primary,
+                              backgroundColor: const Color(0xFFF9EFE6),
+                              labelStyle: TextStyle(
+                                fontSize: 12,
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                                color: isSelected
+                                    ? Colors.white
+                                    : const Color(0xFF6E5A4F),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                side: BorderSide(
+                                  color: isSelected
+                                      ? AppTheme.primary
+                                      : Colors.transparent,
+                                ),
+                              ),
+                              onSelected: (_) {
+                                if (preset == LaporanPreset.custom) {
+                                  _pilihRentang(context, ref);
+                                } else {
+                                  ref
+                                      .read(adminLaporanFilterProvider.notifier)
+                                      .setPreset(preset);
+                                }
+                              },
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ),
-                    riwayatAsync.when(
-                      data: (list) => Text(
-                        '${list.length} catatan',
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF6E5A4F)),
-                      ),
-                      loading: () => const SizedBox.shrink(),
-                      error: (_, _) => const SizedBox.shrink(),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.info_outline,
+                          size: 14,
+                          color: AppTheme.outline,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            _formatPeriodeText(filter),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppTheme.outline,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
             ),
 
-            // Daftar Transaksi
-            riwayatAsync.when(
-              data: (transaksis) {
-                if (transaksis.isEmpty) {
-                  return SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.receipt_outlined, size: 48, color: Colors.grey[400]),
-                          const SizedBox(height: 12),
-                          Text(
-                            isToday
-                                ? 'Belum ada transaksi hari ini.'
-                                : 'Tidak ada transaksi pada tanggal ${AppFormat.date(selectedDate)}.',
-                            style: const TextStyle(color: Color(0xFF6E5A4F)),
+            // Main Content: Summary, Chart, Transaction List
+            laporanAsync.when(
+              data: (laporan) => SliverList(
+                delegate: SliverChildListDelegate([
+                  // Ringkasan Section
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                    child: _buildSummaryCard(laporan.ringkasan),
+                  ),
+
+                  // Tren Penjualan Active Chart
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: TrenPenjualanChart(dataHarian: laporan.harian),
+                  ),
+
+                  // Section Header Transaksi
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Daftar Transaksi',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF2D1F17),
                           ),
-                        ],
+                        ),
+                        Text(
+                          '${laporan.transaksi.length} catatan',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF6E5A4F),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // List Transaksi
+                  if (laporan.transaksi.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 40),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.receipt_outlined,
+                              size: 48,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'Tidak ada transaksi pada periode ini.',
+                              style: TextStyle(color: Color(0xFF6E5A4F)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    ...laporan.transaksi.map(
+                      (t) => _buildTransaksiItem(
+                        context,
+                        ref,
+                        t,
+                        showFullDate: filter.preset != LaporanPreset.hariIni,
                       ),
                     ),
-                  );
-                }
 
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final t = transaksis[index];
-                      return _buildTransaksiItem(context, t);
-                    },
-                    childCount: transaksis.length,
-                  ),
-                );
-              },
+                  const SizedBox(height: 32),
+                ]),
+              ),
               loading: () => const SliverFillRemaining(
                 child: Center(child: CircularProgressIndicator()),
               ),
               error: (err, _) => SliverFillRemaining(
                 hasScrollBody: false,
                 child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error_outline, color: Colors.red, size: 40),
-                      const SizedBox(height: 8),
-                      Text(err.toString().replaceAll('Exception:', '').trim()),
-                      const SizedBox(height: 12),
-                      ElevatedButton(
-                        onPressed: () {
-                          ref.invalidate(adminRingkasanProvider);
-                          ref.invalidate(adminRiwayatProvider);
-                        },
-                        child: const Text('Coba Lagi'),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error_outline,
+                            color: Colors.red, size: 44),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Gagal memuat laporan:\n${err.toString().replaceAll('Exception:', '').trim()}',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () =>
+                              ref.invalidate(adminLaporanProvider),
+                          child: const Text('Coba Lagi'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-
-            const SliverToBoxAdapter(child: SizedBox(height: 32)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSummaryCard(dynamic ringkasan) {
+  Widget _buildSummaryCard(LaporanRingkasan ringkasan) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -293,7 +380,38 @@ class RiwayatTab extends ConsumerWidget {
                     color: Colors.white.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.point_of_sale, color: Colors.white, size: 28),
+                  child: const Icon(
+                    Icons.point_of_sale,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Average per Trx info bar
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            color: const Color(0xFFFEE5D4).withValues(alpha: 0.5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Rata-rata per Transaksi',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF7C4A2D),
+                  ),
+                ),
+                Text(
+                  AppFormat.currency(ringkasan.rataRataTransaksi),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF7C4A2D),
+                  ),
                 ),
               ],
             ),
@@ -317,10 +435,14 @@ class RiwayatTab extends ConsumerWidget {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.payments_outlined, size: 16, color: Color(0xFF7C4A2D)),
+                            const Icon(
+                              Icons.payments_outlined,
+                              size: 16,
+                              color: Color(0xFF7C4A2D),
+                            ),
                             const SizedBox(width: 6),
                             Text(
-                              'TUNAI (${ringkasan.tunai.jumlah})',
+                              'TUNAI (${ringkasan.tunaiJumlah})',
                               style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
@@ -331,7 +453,7 @@ class RiwayatTab extends ConsumerWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          AppFormat.currency(ringkasan.tunai.total),
+                          AppFormat.currency(ringkasan.tunaiTotal),
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
@@ -356,10 +478,14 @@ class RiwayatTab extends ConsumerWidget {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.qr_code_2, size: 16, color: Color(0xFFE28743)),
+                            const Icon(
+                              Icons.qr_code_2,
+                              size: 16,
+                              color: Color(0xFFE28743),
+                            ),
                             const SizedBox(width: 6),
                             Text(
-                              'QRIS (${ringkasan.qris.jumlah})',
+                              'QRIS (${ringkasan.qrisJumlah})',
                               style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
@@ -370,7 +496,7 @@ class RiwayatTab extends ConsumerWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          AppFormat.currency(ringkasan.qris.total),
+                          AppFormat.currency(ringkasan.qrisTotal),
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
@@ -389,9 +515,18 @@ class RiwayatTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildTransaksiItem(BuildContext context, Transaksi t) {
+  Widget _buildTransaksiItem(
+    BuildContext context,
+    WidgetRef ref,
+    Transaksi t, {
+    required bool showFullDate,
+  }) {
     final isBatal = t.status == 'batal';
     final isDiedit = t.dieditAt != null;
+
+    final dateText = showFullDate
+        ? DateFormat('d MMM, HH:mm', 'id_ID').format(t.createdAt.toLocal())
+        : DateFormat('HH:mm', 'id_ID').format(t.createdAt.toLocal());
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
@@ -399,7 +534,9 @@ class RiwayatTab extends ConsumerWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isBatal ? Colors.red.withValues(alpha: 0.3) : const Color(0xFFEBDCD0).withValues(alpha: 0.6),
+          color: isBatal
+              ? Colors.red.withValues(alpha: 0.3)
+              : const Color(0xFFEBDCD0).withValues(alpha: 0.6),
         ),
         boxShadow: [
           BoxShadow(
@@ -410,13 +547,17 @@ class RiwayatTab extends ConsumerWidget {
         ],
       ),
       child: InkWell(
-        onTap: () {
-          showModalBottomSheet(
+        onTap: () async {
+          final res = await showModalBottomSheet(
             context: context,
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
             builder: (_) => AdminTransaksiDetailSheet(transaksi: t),
           );
+          if (res != null) {
+            ref.invalidate(adminLaporanProvider);
+            ref.invalidate(adminLogAktivitasProvider);
+          }
         },
         borderRadius: BorderRadius.circular(16),
         child: Padding(
@@ -432,8 +573,12 @@ class RiwayatTab extends ConsumerWidget {
                     Row(
                       children: [
                         Text(
-                          AppFormat.dateTime(t.createdAt.toLocal()).split(', ').last,
-                          style: const TextStyle(fontSize: 12, color: Color(0xFF9E8D83), fontWeight: FontWeight.w500),
+                          dateText,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF9E8D83),
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                         const SizedBox(width: 8),
                         if (isBatal)
@@ -473,7 +618,8 @@ class RiwayatTab extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF9EFE6),
                       borderRadius: BorderRadius.circular(6),
@@ -490,7 +636,11 @@ class RiwayatTab extends ConsumerWidget {
                 ],
               ),
               const SizedBox(width: 4),
-              const Icon(Icons.chevron_right, size: 18, color: Color(0xFFB39E91)),
+              const Icon(
+                Icons.chevron_right,
+                size: 18,
+                color: Color(0xFFB39E91),
+              ),
             ],
           ),
         ),
@@ -507,7 +657,11 @@ class RiwayatTab extends ConsumerWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(color: color, fontSize: 10.5, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          color: color,
+          fontSize: 10.5,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

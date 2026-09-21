@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme.dart';
 import '../../providers/admin_provider.dart';
+import 'log/log_aktivitas_tab.dart';
 import 'menu/menu_tab.dart';
 import 'pengaturan/pengaturan_tab.dart';
 import 'pin_gate.dart';
@@ -20,6 +21,7 @@ class _AdminLayoutState extends ConsumerState<AdminLayout> {
   final List<Widget> _pages = const [
     RiwayatTab(),
     MenuTab(),
+    LogAktivitasTab(),
     PengaturanTab(),
   ];
 
@@ -93,6 +95,10 @@ class _AdminLayoutState extends ConsumerState<AdminLayout> {
                 BottomNavigationBarItem(
                   icon: Icon(Icons.restaurant_menu),
                   label: 'Menu',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.history_edu),
+                  label: 'Log Aktivitas',
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.settings),
