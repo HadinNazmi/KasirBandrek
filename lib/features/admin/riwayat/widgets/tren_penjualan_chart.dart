@@ -113,36 +113,17 @@ class TrenPenjualanChart extends StatelessWidget {
                               : AppColors.errorBg),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          trendInfo.isUp
-                              ? Icons.trending_up
-                              : (trendInfo.isNeutral
-                                  ? Icons.trending_flat
-                                  : Icons.trending_down),
-                          size: 16,
-                          color: trendInfo.isUp
-                              ? AppColors.success
-                              : (trendInfo.isNeutral
-                                  ? AppColors.textMuted
-                                  : AppColors.error),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          trendInfo.text,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: trendInfo.isUp
-                                ? AppColors.success
-                                : (trendInfo.isNeutral
-                                    ? AppColors.textMuted
-                                    : AppColors.error),
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      trendInfo.text,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: trendInfo.isUp
+                            ? AppColors.success
+                            : (trendInfo.isNeutral
+                                ? AppColors.textMuted
+                                : AppColors.error),
+                      ),
                     ),
                   ),
               ],

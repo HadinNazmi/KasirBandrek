@@ -394,33 +394,6 @@ class RiwayatTab extends ConsumerWidget {
             ),
           ),
 
-          // Average per Trx info bar
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: AppColors.goldTint,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Rata-rata per Transaksi',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.burgundyDeep,
-                  ),
-                ),
-                Text(
-                  AppFormat.currency(ringkasan.rataRataTransaksi),
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.burgundyDeep,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
           // Metode Bayar Breakdowns (Tunai & QRIS)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

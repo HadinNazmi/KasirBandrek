@@ -25,6 +25,10 @@ class HariIniTab extends ConsumerWidget {
         data: (transaksis) {
           final selesai = transaksis.where((t) => t.status == 'selesai').toList();
           final totalHariIni = selesai.fold(0, (sum, t) => sum + t.total);
+          final tunaiList = selesai.where((t) => t.metodeBayar.toLowerCase() == 'tunai').toList();
+          final qrisList = selesai.where((t) => t.metodeBayar.toLowerCase() == 'qris').toList();
+          final totalTunai = tunaiList.fold(0, (sum, t) => sum + t.total);
+          final totalQris = qrisList.fold(0, (sum, t) => sum + t.total);
 
           return RefreshIndicator(
             onRefresh: () async => ref.invalidate(hariIniProvider),
@@ -34,43 +38,172 @@ class HariIniTab extends ConsumerWidget {
                 SliverToBoxAdapter(
                   child: Container(
                     margin: const EdgeInsets.all(16),
-                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppColors.burgundy, AppColors.burgundyDark],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(20),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: AppColors.shadowDark,
+                          blurRadius: 16,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    child: Row(
+                    child: Column(
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        // Total Penjualan Hero
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [AppColors.burgundy, AppColors.burgundyDark],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                          ),
+                          child: Row(
                             children: [
-                              const Text(
-                                'Total Penjualan Hari Ini',
-                                style: TextStyle(color: AppColors.textOnDarkMuted, fontSize: 13),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                AppFormat.currency(totalHariIni),
-                                style: const TextStyle(
-                                  color: AppColors.cream,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Total Penjualan Hari Ini',
+                                      style: TextStyle(color: AppColors.textOnDarkMuted, fontSize: 13),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      AppFormat.currency(totalHariIni),
+                                      style: const TextStyle(
+                                        color: AppColors.cream,
+                                        fontSize: 26,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${selesai.length} transaksi selesai',
+                                      style: const TextStyle(color: AppColors.textOnDarkMuted, fontSize: 12),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${selesai.length} transaksi selesai',
-                                style: const TextStyle(color: AppColors.textOnDarkMuted, fontSize: 12),
                               ),
                             ],
                           ),
                         ),
-                        const Icon(Icons.trending_up, color: AppColors.textOnDarkMuted, size: 48),
+
+                        // Breakdown Metode Bayar: Tunai & QRIS
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          child: Row(
+                            children: [
+                              // Tunai
+                              Expanded(
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surfaceElevated,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: AppColors.border),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: const [
+                                          Icon(
+                                            Icons.payments_outlined,
+                                            size: 16,
+                                            color: AppColors.burgundy,
+                                          ),
+                                          SizedBox(width: 6),
+                                          Text(
+                                            'TUNAI',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.burgundy,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        AppFormat.currency(totalTunai),
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        '${tunaiList.length} transaksi',
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: AppColors.textMuted,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              // QRIS
+                              Expanded(
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surfaceElevated,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: AppColors.border),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: const [
+                                          Icon(
+                                            Icons.qr_code_2,
+                                            size: 16,
+                                            color: AppColors.gold,
+                                          ),
+                                          SizedBox(width: 6),
+                                          Text(
+                                            'QRIS',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.burgundyDeep,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        AppFormat.currency(totalQris),
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        '${qrisList.length} transaksi',
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: AppColors.textMuted,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
