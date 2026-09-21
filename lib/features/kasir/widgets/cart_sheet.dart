@@ -42,50 +42,64 @@ class _CartSheetState extends ConsumerState<CartSheet> {
   @override
   void initState() {
     super.initState();
-    _items = widget.editMode
-        ? List.from(widget.initialItems)
-        : List.from(ref.read(cartProvider));
+    _items = widget.editMode ? List.from(widget.initialItems) : [];
     _metodeBayar = widget.initialMetode;
   }
 
-  int get _totalHarga => _items.fold(0, (s, i) => s + i.subtotal);
+  List<TransaksiItem> get _currentItems =>
+      widget.editMode ? _items : ref.watch(cartProvider);
 
-  void _increment(int idx) {
-    setState(() {
-      final item = _items[idx];
-      _items[idx] = TransaksiItem(
-        namaMenu: item.namaMenu,
-        hargaSatuan: item.hargaSatuan,
-        qty: item.qty + 1,
-        subtotal: item.hargaSatuan * (item.qty + 1),
-      );
-    });
-  }
+  int get _totalHarga => _currentItems.fold(0, (s, i) => s + i.subtotal);
 
-  void _decrement(int idx) {
-    setState(() {
-      final item = _items[idx];
-      if (item.qty > 1) {
+  void _increment(int idx, TransaksiItem item) {
+    if (widget.editMode) {
+      setState(() {
+        final current = _items[idx];
         _items[idx] = TransaksiItem(
-          namaMenu: item.namaMenu,
-          hargaSatuan: item.hargaSatuan,
-          qty: item.qty - 1,
-          subtotal: item.hargaSatuan * (item.qty - 1),
+          namaMenu: current.namaMenu,
+          hargaSatuan: current.hargaSatuan,
+          qty: current.qty + 1,
+          subtotal: current.hargaSatuan * (current.qty + 1),
         );
-      } else {
-        _items.removeAt(idx);
-      }
-    });
+      });
+    } else {
+      ref.read(cartProvider.notifier).incrementQty(item.namaMenu);
+    }
   }
 
-  void _remove(int idx) {
-    setState(() {
-      _items.removeAt(idx);
-    });
+  void _decrement(int idx, TransaksiItem item) {
+    if (widget.editMode) {
+      setState(() {
+        final current = _items[idx];
+        if (current.qty > 1) {
+          _items[idx] = TransaksiItem(
+            namaMenu: current.namaMenu,
+            hargaSatuan: current.hargaSatuan,
+            qty: current.qty - 1,
+            subtotal: current.hargaSatuan * (current.qty - 1),
+          );
+        } else {
+          _items.removeAt(idx);
+        }
+      });
+    } else {
+      ref.read(cartProvider.notifier).decrementQty(item.namaMenu);
+    }
+  }
+
+  void _remove(int idx, TransaksiItem item) {
+    if (widget.editMode) {
+      setState(() {
+        _items.removeAt(idx);
+      });
+    } else {
+      ref.read(cartProvider.notifier).removeItem(item.namaMenu);
+    }
   }
 
   Future<void> _simpan() async {
-    if (_items.isEmpty) return;
+    final itemsToSave = widget.editMode ? _items : ref.read(cartProvider);
+    if (itemsToSave.isEmpty) return;
     setState(() => _isLoading = true);
 
     try {
@@ -95,7 +109,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
           await repo.editPending(
             id: widget.transaksiId!,
             metode: _metodeBayar,
-            items: _items,
+            items: itemsToSave,
           );
         } else {
           final svc = ref.read(supabaseServiceProvider);
@@ -104,7 +118,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
               token: widget.adminToken!,
               id: widget.transaksiId!,
               metode: _metodeBayar,
-              items: _items,
+              items: itemsToSave,
             );
             ref.invalidate(adminRiwayatProvider);
             ref.invalidate(adminRingkasanProvider);
@@ -112,7 +126,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
             await svc.kasirEditTransaksi(
               id: widget.transaksiId!,
               metode: _metodeBayar,
-              items: _items,
+              items: itemsToSave,
             );
           }
         }
@@ -125,7 +139,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
         }
       } else {
         final repo = ref.read(transaksiRepositoryProvider);
-        await repo.simpan(metode: _metodeBayar, items: _items);
+        await repo.simpan(metode: _metodeBayar, items: itemsToSave);
         ref.read(cartProvider.notifier).clear();
         ref.invalidate(hariIniProvider);
         if (mounted) {
@@ -162,6 +176,8 @@ class _CartSheetState extends ConsumerState<CartSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final items = _currentItems;
+
     return DraggableScrollableSheet(
       initialChildSize: 0.75,
       minChildSize: 0.5,
@@ -197,11 +213,10 @@ class _CartSheetState extends ConsumerState<CartSheet> {
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const Spacer(),
-                    if (!widget.editMode && _items.isNotEmpty)
+                    if (!widget.editMode && items.isNotEmpty)
                       TextButton(
                         onPressed: () {
                           ref.read(cartProvider.notifier).clear();
-                          setState(() => _items.clear());
                         },
                         child: const Text('Kosongkan', style: TextStyle(color: Colors.red)),
                       ),
@@ -212,14 +227,14 @@ class _CartSheetState extends ConsumerState<CartSheet> {
 
               // Daftar item
               Expanded(
-                child: _items.isEmpty
+                child: items.isEmpty
                     ? const Center(child: Text('Pesanan kosong', style: TextStyle(color: Colors.grey)))
                     : ListView.separated(
                         controller: scrollController,
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        itemCount: _items.length,
+                        itemCount: items.length,
                         separatorBuilder: (_, _) => const SizedBox(height: 8),
-                        itemBuilder: (_, idx) => _buildItemRow(_items[idx], idx),
+                        itemBuilder: (_, idx) => _buildItemRow(items[idx], idx),
                       ),
               ),
 
@@ -264,7 +279,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
                     ),
                     const SizedBox(height: 12),
                     ElevatedButton(
-                      onPressed: (_items.isEmpty || _isLoading) ? null : _simpan,
+                      onPressed: (items.isEmpty || _isLoading) ? null : _simpan,
                       child: _isLoading
                           ? const SizedBox(
                               width: 20, height: 20,
@@ -292,7 +307,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => _remove(idx),
+            onTap: () => _remove(idx, item),
             child: Container(
               width: 32, height: 32,
               decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.1), shape: BoxShape.circle),
@@ -310,12 +325,12 @@ class _CartSheetState extends ConsumerState<CartSheet> {
             ),
           ),
           Row(children: [
-            _qtyButton(Icons.remove, () => _decrement(idx)),
+            _qtyButton(Icons.remove, () => _decrement(idx, item)),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text('${item.qty}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ),
-            _qtyButton(Icons.add, () => _increment(idx)),
+            _qtyButton(Icons.add, () => _increment(idx, item)),
           ]),
         ],
       ),

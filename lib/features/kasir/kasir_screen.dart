@@ -4,6 +4,7 @@ import '../../core/format.dart';
 import '../../core/theme.dart';
 import '../../data/models/menu.dart';
 import '../../data/models/transaksi.dart';
+import '../../data/models/transaksi_item.dart';
 import '../../data/transaksi_repository.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/kategori_provider.dart';
@@ -236,12 +237,12 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
                         padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          childAspectRatio: 0.82,
+                          childAspectRatio: 0.78,
                           crossAxisSpacing: 12,
                           mainAxisSpacing: 12,
                         ),
                         itemCount: filtered.length,
-                        itemBuilder: (_, index) => _buildMenuCard(filtered[index]),
+                        itemBuilder: (_, index) => _buildMenuCard(filtered[index], cart),
                       ),
                     );
                   },
@@ -369,11 +370,19 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
     );
   }
 
-  Widget _buildMenuCard(Menu menu) {
+  Widget _buildMenuCard(Menu menu, List<TransaksiItem> cart) {
+    final cartIndex = cart.indexWhere((item) => item.namaMenu == menu.nama);
+    final qty = cartIndex >= 0 ? cart[cartIndex].qty : 0;
+
     return Card(
       clipBehavior: Clip.antiAlias,
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: qty > 0 ? 3 : 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: qty > 0
+            ? const BorderSide(color: AppTheme.primary, width: 2)
+            : BorderSide(color: Colors.black.withValues(alpha: 0.06)),
+      ),
       child: InkWell(
         onTap: () => ref.read(cartProvider.notifier).addMenu(menu),
         child: Column(
@@ -392,25 +401,122 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
                     )
                   else
                     _buildPlaceholderPhoto(),
+                  // Badge jumlah di pojok kanan atas jika qty > 0
+                  if (qty > 0)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primary,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.25),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          '$qty',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     menu.nama,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                    maxLines: 2,
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    AppFormat.currency(menu.harga),
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.primary),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          AppFormat.currency(menu.harga),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.primary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      if (qty > 0)
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF4EBE3),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFFE2CCBA)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () => ref.read(cartProvider.notifier).decrementQty(menu.nama),
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(4),
+                                    child: Icon(Icons.remove, size: 16, color: AppTheme.primary),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                child: Text(
+                                  '$qty',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.primary,
+                                  ),
+                                ),
+                              ),
+                              Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () => ref.read(cartProvider.notifier).incrementQty(menu.nama),
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(4),
+                                    child: Icon(Icons.add, size: 16, color: AppTheme.primary),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primary.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.add, size: 16, color: AppTheme.primary),
+                        ),
+                    ],
                   ),
                 ],
               ),
