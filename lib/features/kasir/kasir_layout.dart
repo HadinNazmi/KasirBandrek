@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme.dart';
 import 'kasir_screen.dart';
@@ -13,6 +14,7 @@ class KasirLayout extends ConsumerStatefulWidget {
 
 class _KasirLayoutState extends ConsumerState<KasirLayout> {
   int _currentIndex = 0;
+  DateTime? _lastBackPressTime;
 
   final List<Widget> _pages = const [
     KasirScreen(),
@@ -21,7 +23,35 @@ class _KasirLayoutState extends ConsumerState<KasirLayout> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+
+        // Jika sedang di tab selain Kasir, kembali ke tab Kasir dulu
+        if (_currentIndex != 0) {
+          setState(() => _currentIndex = 0);
+          return;
+        }
+
+        // Cek double tap back dalam kurun waktu 2 detik
+        final now = DateTime.now();
+        if (_lastBackPressTime == null ||
+            now.difference(_lastBackPressTime!) > const Duration(seconds: 2)) {
+          _lastBackPressTime = now;
+          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Tekan sekali lagi untuk keluar'),
+              duration: Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        } else {
+          SystemNavigator.pop();
+        }
+      },
+      child: Center(
       child: Container(
         constraints: const BoxConstraints(maxWidth: 480),
         decoration: BoxDecoration(
@@ -61,6 +91,7 @@ class _KasirLayoutState extends ConsumerState<KasirLayout> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
