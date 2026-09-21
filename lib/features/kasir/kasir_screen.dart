@@ -9,6 +9,7 @@ import '../../providers/kategori_provider.dart';
 import '../../providers/menu_provider.dart';
 import '../../providers/supabase_provider.dart';
 import '../../providers/hari_ini_provider.dart';
+import '../admin/pin_gate.dart';
 import 'widgets/cart_sheet.dart';
 
 class KasirScreen extends ConsumerStatefulWidget {
@@ -101,8 +102,18 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
       appBar: AppBar(
         title: const Text('Kedai Bandrek', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.admin_panel_settings_outlined),
+            tooltip: 'Mode Admin',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PinGateScreen()),
+              );
+            },
+          ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.only(left: 4, right: 16),
             child: Row(
               children: [
                 Container(
@@ -191,7 +202,7 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: AppTheme.surface,
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.07), offset: const Offset(0, -4), blurRadius: 12)],
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.07), offset: const Offset(0, -4), blurRadius: 12)],
                 ),
                 child: SafeArea(
                   top: false,

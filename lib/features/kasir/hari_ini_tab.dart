@@ -126,7 +126,7 @@ class HariIniTab extends ConsumerWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isBatal ? Colors.red.withOpacity(0.3) : Colors.transparent,
+            color: isBatal ? Colors.red.withValues(alpha: 0.3) : Colors.transparent,
           ),
         ),
         child: Row(
@@ -192,7 +192,7 @@ class HariIniTab extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
@@ -316,7 +316,7 @@ class HariIniTab extends ConsumerWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: Colors.red.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Center(

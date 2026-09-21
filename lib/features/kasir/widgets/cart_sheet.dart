@@ -4,6 +4,7 @@ import '../../../core/format.dart';
 import '../../../core/theme.dart';
 import '../../../data/models/transaksi_item.dart';
 import '../../../data/transaksi_repository.dart';
+import '../../../providers/admin_provider.dart';
 import '../../../providers/cart_provider.dart';
 import '../../../providers/hari_ini_provider.dart';
 import '../../../providers/supabase_provider.dart';
@@ -16,6 +17,7 @@ class CartSheet extends ConsumerStatefulWidget {
   final String? transaksiId;
   final List<TransaksiItem> initialItems;
   final String initialMetode;
+  final String? adminToken;
 
   const CartSheet({
     super.key,
@@ -23,6 +25,7 @@ class CartSheet extends ConsumerStatefulWidget {
     this.transaksiId,
     this.initialItems = const [],
     this.initialMetode = 'tunai',
+    this.adminToken,
   });
 
   @override
@@ -86,11 +89,22 @@ class _CartSheetState extends ConsumerState<CartSheet> {
     try {
       if (widget.editMode) {
         final svc = ref.read(supabaseServiceProvider);
-        await svc.kasirEditTransaksi(
-          id: widget.transaksiId!,
-          metode: _metodeBayar,
-          items: _items,
-        );
+        if (widget.adminToken != null) {
+          await svc.adminEditTransaksi(
+            token: widget.adminToken!,
+            id: widget.transaksiId!,
+            metode: _metodeBayar,
+            items: _items,
+          );
+          ref.invalidate(adminRiwayatProvider);
+          ref.invalidate(adminRingkasanProvider);
+        } else {
+          await svc.kasirEditTransaksi(
+            id: widget.transaksiId!,
+            metode: _metodeBayar,
+            items: _items,
+          );
+        }
         ref.invalidate(hariIniProvider);
         if (mounted) {
           Navigator.pop(context, true);
@@ -108,11 +122,26 @@ class _CartSheetState extends ConsumerState<CartSheet> {
         }
       }
     } catch (e) {
+      final errStr = e.toString();
+      if (errStr.contains('SESI_TIDAK_VALID')) {
+        ref.read(adminTokenProvider.notifier).clearToken();
+        if (mounted) {
+          Navigator.pop(context, false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Sesi admin telah berakhir. Silakan masuk kembali.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString().replaceAll('Exception:', '').trim()),
+            content: Text(errStr.replaceAll('Exception:', '').trim()),
             backgroundColor: Colors.red,
           ),
         );
@@ -178,7 +207,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
                         controller: scrollController,
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         itemCount: _items.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        separatorBuilder: (_, _) => const SizedBox(height: 8),
                         itemBuilder: (_, idx) => _buildItemRow(_items[idx], idx),
                       ),
               ),
@@ -255,7 +284,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
             onTap: () => _remove(idx),
             child: Container(
               width: 32, height: 32,
-              decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), shape: BoxShape.circle),
+              decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.1), shape: BoxShape.circle),
               child: const Icon(Icons.close, size: 16, color: Colors.red),
             ),
           ),

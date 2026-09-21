@@ -1,4 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'models/admin_menu_item.dart';
+import 'models/admin_ringkasan.dart';
 import 'models/transaksi.dart';
 import 'models/transaksi_item.dart';
 
@@ -88,12 +90,12 @@ class SupabaseService {
     return list.map((e) => Transaksi.fromJson(e as Map<String, dynamic>)).toList();
   }
 
-  Future<Map<String, dynamic>> adminRingkasan(String token, {String? tanggal}) async {
+  Future<AdminRingkasan> adminRingkasan(String token, {String? tanggal}) async {
     final response = await _client.rpc('admin_ringkasan', params: {
       'p_token': token,
       'p_tanggal': tanggal,
     });
-    return response as Map<String, dynamic>;
+    return AdminRingkasan.fromJson(response as Map<String, dynamic>);
   }
 
   Future<Map<String, dynamic>> adminEditTransaksi({
@@ -122,11 +124,12 @@ class SupabaseService {
     return response as Map<String, dynamic>;
   }
 
-  Future<List<Map<String, dynamic>>> adminDaftarMenu(String token) async {
+  Future<List<AdminMenuItem>> adminDaftarMenu(String token) async {
     final response = await _client.rpc('admin_daftar_menu', params: {
       'p_token': token,
     });
-    return List<Map<String, dynamic>>.from(response as List);
+    final List list = response as List;
+    return list.map((e) => AdminMenuItem.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   Future<Map<String, dynamic>> adminSimpanMenu({
