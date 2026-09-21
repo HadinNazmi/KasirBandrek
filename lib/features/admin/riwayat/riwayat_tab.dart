@@ -10,7 +10,7 @@ import '../../../providers/admin_log_provider.dart';
 import '../../../providers/admin_provider.dart';
 import '../pin_gate.dart';
 import 'admin_transaksi_detail_sheet.dart';
-import 'widgets/tren_penjualan_chart.dart';
+import '../../shared/widgets/produk_terjual_card.dart';
 
 class RiwayatTab extends ConsumerWidget {
   const RiwayatTab({super.key});
@@ -216,10 +216,13 @@ class RiwayatTab extends ConsumerWidget {
                     child: _buildSummaryCard(laporan.ringkasan),
                   ),
 
-                  // Tren Penjualan Active Chart
+                  // Produk Terjual Section
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: TrenPenjualanChart(dataHarian: laporan.harian),
+                    child: ProdukTerjualCard(
+                      transaksi: laporan.transaksi,
+                      judulPeriode: _formatPeriodeText(filter),
+                    ),
                   ),
 
                   // Section Header Transaksi

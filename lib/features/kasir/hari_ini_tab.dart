@@ -8,6 +8,7 @@ import '../../providers/hari_ini_provider.dart';
 import '../../providers/sync_provider.dart';
 import '../../providers/supabase_provider.dart';
 import 'widgets/cart_sheet.dart';
+import '../shared/widgets/produk_terjual_card.dart';
 
 class HariIniTab extends ConsumerWidget {
   const HariIniTab({super.key});
@@ -74,6 +75,18 @@ class HariIniTab extends ConsumerWidget {
                     ),
                   ),
                 ),
+
+                // Produk Terjual Hari Ini
+                if (selesai.isNotEmpty)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                      child: ProdukTerjualCard(
+                        transaksi: transaksis,
+                        judulPeriode: 'Hanya transaksi selesai hari ini',
+                      ),
+                    ),
+                  ),
 
                 if (transaksis.isEmpty)
                   const SliverFillRemaining(

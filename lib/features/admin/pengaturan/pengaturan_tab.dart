@@ -333,11 +333,13 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
         builder: (ctx, setDialogState) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Text('Ubah PIN Admin', style: TextStyle(fontWeight: FontWeight.bold)),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+          content: SizedBox(
+            width: 320,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                 if (dialogError != null) ...[
                   Container(
                     padding: const EdgeInsets.all(10),
@@ -415,6 +417,7 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
               ],
             ),
           ),
+        ),
           actions: [
             TextButton(
               onPressed: isSaving ? null : () => Navigator.pop(dCtx),
@@ -751,21 +754,25 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                   ),
                 ],
               ),
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                leading: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFEE5D4),
-                    borderRadius: BorderRadius.circular(10),
+              child: Material(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(20),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  leading: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFEE5D4),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.pin_outlined, color: AppTheme.primary, size: 22),
                   ),
-                  child: const Icon(Icons.pin_outlined, color: AppTheme.primary, size: 22),
+                  title: const Text('Ubah PIN Admin', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  subtitle: const Text('Ganti 6 digit PIN untuk akses admin', style: TextStyle(fontSize: 12, color: Color(0xFF6E5A4F))),
+                  trailing: const Icon(Icons.chevron_right, color: Color(0xFFB39E91)),
+                  onTap: _showUbahPinDialog,
                 ),
-                title: const Text('Ubah PIN Admin', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                subtitle: const Text('Ganti 6 digit PIN untuk akses admin', style: TextStyle(fontSize: 12, color: Color(0xFF6E5A4F))),
-                trailing: const Icon(Icons.chevron_right, color: Color(0xFFB39E91)),
-                onTap: _showUbahPinDialog,
               ),
             ),
 
