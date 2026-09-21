@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/theme.dart';
+import '../../core/app_colors.dart';
 import '../../providers/admin_provider.dart';
 import 'log/log_aktivitas_tab.dart';
 import 'menu/menu_tab.dart';
@@ -50,9 +50,9 @@ class _AdminLayoutState extends ConsumerState<AdminLayout> {
           constraints: const BoxConstraints(maxWidth: 480),
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: AppColors.shadowDark,
               blurRadius: 10,
               spreadRadius: 1,
             ),
@@ -64,13 +64,13 @@ class _AdminLayoutState extends ConsumerState<AdminLayout> {
             children: _pages,
           ),
           bottomNavigationBar: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
+            decoration: const BoxDecoration(
+              color: AppColors.bottomNavBg,
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF7C4A2D).withValues(alpha: 0.08),
+                  color: AppColors.shadowDark,
                   blurRadius: 16,
-                  offset: const Offset(0, -4),
+                  offset: Offset(0, -4),
                 ),
               ],
             ),
@@ -81,9 +81,9 @@ class _AdminLayoutState extends ConsumerState<AdminLayout> {
                   _currentIndex = index;
                 });
               },
-              backgroundColor: Colors.white,
-              selectedItemColor: AppTheme.secondary,
-              unselectedItemColor: const Color(0xFF84746C),
+              backgroundColor: AppColors.bottomNavBg,
+              selectedItemColor: AppColors.gold,
+              unselectedItemColor: AppColors.textOnDarkMuted,
               selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
               unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
               type: BottomNavigationBarType.fixed,

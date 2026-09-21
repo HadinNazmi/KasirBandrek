@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/app_colors.dart';
 import '../../core/format.dart';
-import '../../core/theme.dart';
 import '../../data/models/transaksi.dart';
 import '../../data/transaksi_repository.dart';
 import '../../providers/hari_ini_provider.dart';
@@ -37,7 +37,7 @@ class HariIniTab extends ConsumerWidget {
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [AppTheme.primary, Color(0xFFAD6B45)],
+                        colors: [AppColors.burgundy, AppColors.burgundyDark],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -51,13 +51,13 @@ class HariIniTab extends ConsumerWidget {
                             children: [
                               const Text(
                                 'Total Penjualan Hari Ini',
-                                style: TextStyle(color: Colors.white70, fontSize: 13),
+                                style: TextStyle(color: AppColors.textOnDarkMuted, fontSize: 13),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 AppFormat.currency(totalHariIni),
                                 style: const TextStyle(
-                                  color: Colors.white,
+                                  color: AppColors.cream,
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -65,12 +65,12 @@ class HariIniTab extends ConsumerWidget {
                               const SizedBox(height: 4),
                               Text(
                                 '${selesai.length} transaksi selesai',
-                                style: const TextStyle(color: Colors.white60, fontSize: 12),
+                                style: const TextStyle(color: AppColors.textOnDarkMuted, fontSize: 12),
                               ),
                             ],
                           ),
                         ),
-                        const Icon(Icons.trending_up, color: Colors.white30, size: 48),
+                        const Icon(Icons.trending_up, color: AppColors.textOnDarkMuted, size: 48),
                       ],
                     ),
                   ),
@@ -90,7 +90,7 @@ class HariIniTab extends ConsumerWidget {
 
                 if (transaksis.isEmpty)
                   const SliverFillRemaining(
-                    child: Center(child: Text('Belum ada transaksi hari ini.')),
+                    child: Center(child: Text('Belum ada transaksi hari ini.', style: TextStyle(color: AppColors.textSecondary))),
                   )
                 else
                   SliverList(
@@ -113,9 +113,9 @@ class HariIniTab extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.error_outline, color: Colors.red, size: 40),
+              const Icon(Icons.error_outline, color: AppColors.error, size: 40),
               const SizedBox(height: 8),
-              Text(err.toString().replaceAll('Exception:', '').trim()),
+              Text(err.toString().replaceAll('Exception:', '').trim(), style: const TextStyle(color: AppColors.error)),
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () => ref.invalidate(hariIniProvider),
@@ -138,10 +138,10 @@ class HariIniTab extends ConsumerWidget {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isBatal ? Colors.red.withValues(alpha: 0.3) : Colors.transparent,
+            color: isBatal ? AppColors.errorBorder : AppColors.border,
           ),
         ),
         child: Row(
@@ -154,18 +154,18 @@ class HariIniTab extends ConsumerWidget {
                   Row(children: [
                     Text(
                       AppFormat.dateTime(t.createdAt.toLocal()).split(', ').last,
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
                     ),
                     const SizedBox(width: 6),
                     if (isBatal)
-                      _badge('Batal', Colors.red)
+                      _badge('Batal', AppColors.error)
                     else ...[
                       if (t.isPending) ...[
-                        _badge('Belum terkirim', Colors.orange),
+                        _badge('Belum terkirim', AppColors.warning),
                         const SizedBox(width: 4),
                       ],
                       if (isDiedit)
-                        _badge('Diedit', Colors.blueGrey),
+                        _badge('Diedit', AppColors.info),
                     ],
                   ]),
                   const SizedBox(height: 4),
@@ -177,7 +177,7 @@ class HariIniTab extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: isBatal ? Colors.grey : Colors.black,
+                      color: isBatal ? AppColors.textMuted : AppColors.textPrimary,
                       decoration: isBatal ? TextDecoration.lineThrough : null,
                     ),
                   ),
@@ -192,14 +192,14 @@ class HariIniTab extends ConsumerWidget {
                   AppFormat.currency(t.total),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isBatal ? Colors.grey : AppTheme.primary,
+                    color: isBatal ? AppColors.textMuted : AppColors.burgundy,
                     decoration: isBatal ? TextDecoration.lineThrough : null,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   t.metodeBayar.toUpperCase(),
-                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                 ),
               ],
             ),
@@ -226,7 +226,7 @@ class HariIniTab extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -244,7 +244,7 @@ class HariIniTab extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Container(
                   width: 40, height: 4,
-                  decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(4)),
+                  decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(4)),
                 ),
               ),
               // Header
@@ -253,21 +253,21 @@ class HariIniTab extends ConsumerWidget {
                 child: Row(children: [
                   Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(AppFormat.dateTime(t.createdAt.toLocal()),
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.textPrimary)),
                     Row(
                       children: [
                         Text(t.metodeBayar.toUpperCase(),
-                            style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                         if (t.isPending) ...[
                           const SizedBox(width: 8),
-                          _badge('Belum terkirim', Colors.orange),
+                          _badge('Belum terkirim', AppColors.warning),
                         ],
                       ],
                     ),
                   ]),
                   const Spacer(),
                   Text(AppFormat.currency(t.total),
-                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppTheme.primary)),
+                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppColors.burgundy)),
                   const SizedBox(width: 12),
                   InkWell(
                     onTap: () => Navigator.pop(ctx),
@@ -276,10 +276,10 @@ class HariIniTab extends ConsumerWidget {
                       width: 30,
                       height: 30,
                       decoration: const BoxDecoration(
-                        color: Color(0xFFF6ECE3),
+                        color: AppColors.surfaceElevated,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.close, size: 16, color: Color(0xFF52443D)),
+                      child: const Icon(Icons.close, size: 16, color: AppColors.textPrimary),
                     ),
                   ),
                 ]),
@@ -319,7 +319,7 @@ class HariIniTab extends ConsumerWidget {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Butuh internet untuk mengubah transaksi yang sudah terkirim'),
-                                  backgroundColor: Colors.orange,
+                                  backgroundColor: AppColors.warning,
                                 ),
                               );
                               return;
@@ -344,8 +344,8 @@ class HariIniTab extends ConsumerWidget {
                         label: const Text('Edit'),
                         style: OutlinedButton.styleFrom(
                           minimumSize: const Size(0, 48),
-                          foregroundColor: AppTheme.primary,
-                          side: const BorderSide(color: AppTheme.primary),
+                          foregroundColor: AppColors.burgundy,
+                          side: const BorderSide(color: AppColors.burgundy),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                       ),
@@ -358,8 +358,8 @@ class HariIniTab extends ConsumerWidget {
                         label: const Text('Batalkan'),
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(0, 48),
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
+                          backgroundColor: AppColors.error,
+                          foregroundColor: AppColors.cream,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                       ),
@@ -373,12 +373,12 @@ class HariIniTab extends ConsumerWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      color: Colors.red.withValues(alpha: 0.1),
+                      color: AppColors.errorBg,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Center(
                       child: Text('Transaksi ini sudah dibatalkan',
-                          style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
+                          style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w600)),
                     ),
                   ),
                 ),
@@ -396,7 +396,7 @@ class HariIniTab extends ConsumerWidget {
         ScaffoldMessenger.of(rootCtx).showSnackBar(
           const SnackBar(
             content: Text('Butuh internet untuk mengubah transaksi yang sudah terkirim'),
-            backgroundColor: Colors.orange,
+            backgroundColor: AppColors.warning,
           ),
         );
         return;
@@ -406,13 +406,20 @@ class HariIniTab extends ConsumerWidget {
     final confirm = await showDialog<bool>(
       context: sheetCtx,
       builder: (dCtx) => AlertDialog(
-        title: const Text('Batalkan Transaksi'),
-        content: const Text('Apakah Anda yakin ingin membatalkan transaksi ini? Tindakan ini tidak bisa diurungkan.'),
+        backgroundColor: AppColors.cardBg,
+        title: const Text('Batalkan Transaksi', style: TextStyle(color: AppColors.textDark)),
+        content: const Text(
+          'Apakah Anda yakin ingin membatalkan transaksi ini? Tindakan ini tidak bisa diurungkan.',
+          style: TextStyle(color: AppColors.textMuted),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dCtx, false), child: const Text('Tidak')),
+          TextButton(
+            onPressed: () => Navigator.pop(dCtx, false),
+            child: const Text('Tidak', style: TextStyle(color: AppColors.textDark)),
+          ),
           ElevatedButton(
             onPressed: () => Navigator.pop(dCtx, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error, foregroundColor: AppColors.cream),
             child: const Text('Ya, Batalkan'),
           ),
         ],
@@ -440,7 +447,7 @@ class HariIniTab extends ConsumerWidget {
         ScaffoldMessenger.of(rootCtx).showSnackBar(
           SnackBar(
             content: Text(e.toString().replaceAll('Exception:', '').trim()),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }

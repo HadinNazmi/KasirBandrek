@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import '../../../core/app_colors.dart';
 import '../../../core/format.dart';
 import '../../../core/theme.dart';
 import '../../../data/models/laporan_penjualan.dart';
@@ -32,10 +33,10 @@ class RiwayatTab extends ConsumerWidget {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: AppTheme.primary,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Color(0xFF1F1B16),
+              primary: AppColors.burgundy,
+              onPrimary: AppColors.cream,
+              surface: AppColors.surface,
+              onSurface: AppColors.textPrimary,
             ),
           ),
           child: child!,
@@ -64,7 +65,7 @@ class RiwayatTab extends ConsumerWidget {
           const SnackBar(
             content:
                 Text('Sesi admin telah berakhir. Silakan masukkan PIN kembali.'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       });
@@ -103,20 +104,20 @@ class RiwayatTab extends ConsumerWidget {
     laporanAsync.whenOrNull(error: (e, _) => _checkSession(context, e, ref));
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9EFE6),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: const Text(
           'Riwayat & Laporan',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.cream),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.appBarBg,
         elevation: 0,
         actions: [
           IconButton(
             tooltip: 'Pilih Rentang Tanggal',
             onPressed: () => _pilihRentang(context, ref),
-            icon: const Icon(Icons.date_range, color: AppTheme.primary),
+            icon: const Icon(Icons.date_range, color: AppColors.cream),
           ),
         ],
       ),
@@ -131,7 +132,7 @@ class RiwayatTab extends ConsumerWidget {
             // Filter Presets Bar
             SliverToBoxAdapter(
               child: Container(
-                color: Colors.white,
+                color: AppColors.surface,
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,16 +148,16 @@ class RiwayatTab extends ConsumerWidget {
                               label: Text(preset.label),
                               selected: isSelected,
                               showCheckmark: false,
-                              selectedColor: AppTheme.primary,
-                              backgroundColor: const Color(0xFFF9EFE6),
+                              selectedColor: AppColors.burgundy,
+                              backgroundColor: AppColors.surfaceElevated,
                               labelStyle: TextStyle(
                                 fontSize: 12,
                                 fontWeight: isSelected
                                     ? FontWeight.w700
                                     : FontWeight.w500,
                                 color: isSelected
-                                    ? Colors.white
-                                    : const Color(0xFF6E5A4F),
+                                    ? AppColors.cream
+                                    : AppColors.textSecondary,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
@@ -236,14 +237,14 @@ class RiwayatTab extends ConsumerWidget {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF2D1F17),
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         Text(
                           '${laporan.transaksi.length} catatan',
                           style: const TextStyle(
                             fontSize: 12,
-                            color: Color(0xFF6E5A4F),
+                            color: AppColors.textSecondary,
                           ),
                         ),
                       ],
@@ -252,8 +253,8 @@ class RiwayatTab extends ConsumerWidget {
 
                   // List Transaksi
                   if (laporan.transaksi.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 40),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 40),
                       child: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -261,12 +262,12 @@ class RiwayatTab extends ConsumerWidget {
                             Icon(
                               Icons.receipt_outlined,
                               size: 48,
-                              color: Colors.grey[400],
+                              color: AppColors.textMuted,
                             ),
-                            const SizedBox(height: 12),
-                            const Text(
+                            SizedBox(height: 12),
+                            Text(
                               'Tidak ada transaksi pada periode ini.',
-                              style: TextStyle(color: Color(0xFF6E5A4F)),
+                              style: TextStyle(color: AppColors.textSecondary),
                             ),
                           ],
                         ),
@@ -297,12 +298,12 @@ class RiwayatTab extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.error_outline,
-                            color: Colors.red, size: 44),
+                            color: AppColors.error, size: 44),
                         const SizedBox(height: 12),
                         Text(
                           'Gagal memuat laporan:\n${err.toString().replaceAll('Exception:', '').trim()}',
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.red),
+                          style: const TextStyle(color: AppColors.error),
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton(
@@ -325,13 +326,13 @@ class RiwayatTab extends ConsumerWidget {
   Widget _buildSummaryCard(LaporanRingkasan ringkasan) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: const Color(0xFF7C4A2D).withValues(alpha: 0.08),
+            color: AppColors.shadowDark,
             blurRadius: 16,
-            offset: const Offset(0, 4),
+            offset: Offset(0, 4),
           ),
         ],
       ),
@@ -342,7 +343,7 @@ class RiwayatTab extends ConsumerWidget {
             padding: const EdgeInsets.all(20),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF7C4A2D), Color(0xFF9E5D38)],
+                colors: [AppColors.burgundy, AppColors.burgundyDark],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -356,13 +357,13 @@ class RiwayatTab extends ConsumerWidget {
                     children: [
                       const Text(
                         'Total Penjualan (Selesai)',
-                        style: TextStyle(color: Colors.white70, fontSize: 13),
+                        style: TextStyle(color: AppColors.textOnDarkMuted, fontSize: 13),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         AppFormat.currency(ringkasan.totalPenjualan),
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.cream,
                           fontSize: 26,
                           fontWeight: FontWeight.bold,
                         ),
@@ -371,7 +372,7 @@ class RiwayatTab extends ConsumerWidget {
                       Text(
                         '${ringkasan.jumlahTransaksi} transaksi berhasil'
                         '${ringkasan.jumlahBatal > 0 ? ' • ${ringkasan.jumlahBatal} batal' : ''}',
-                        style: const TextStyle(color: Colors.white60, fontSize: 12),
+                        style: const TextStyle(color: AppColors.textOnDarkMuted, fontSize: 12),
                       ),
                     ],
                   ),
@@ -380,12 +381,12 @@ class RiwayatTab extends ConsumerWidget {
                   width: 52,
                   height: 52,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
+                    color: AppColors.cream.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.point_of_sale,
-                    color: Colors.white,
+                    color: AppColors.cream,
                     size: 28,
                   ),
                 ),
@@ -396,7 +397,7 @@ class RiwayatTab extends ConsumerWidget {
           // Average per Trx info bar
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: const Color(0xFFFEE5D4).withValues(alpha: 0.5),
+            color: AppColors.goldTint,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -405,7 +406,7 @@ class RiwayatTab extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF7C4A2D),
+                    color: AppColors.burgundyDeep,
                   ),
                 ),
                 Text(
@@ -413,7 +414,7 @@ class RiwayatTab extends ConsumerWidget {
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF7C4A2D),
+                    color: AppColors.burgundyDeep,
                   ),
                 ),
               ],
@@ -430,26 +431,26 @@ class RiwayatTab extends ConsumerWidget {
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF9EFE6),
+                      color: AppColors.surfaceElevated,
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
-                          children: [
-                            const Icon(
+                          children: const [
+                            Icon(
                               Icons.payments_outlined,
                               size: 16,
-                              color: Color(0xFF7C4A2D),
+                              color: AppColors.burgundy,
                             ),
-                            const SizedBox(width: 6),
+                            SizedBox(width: 6),
                             Text(
-                              'TUNAI (${ringkasan.tunaiJumlah})',
-                              style: const TextStyle(
+                              'TUNAI',
+                              style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF7C4A2D),
+                                color: AppColors.burgundy,
                               ),
                             ),
                           ],
@@ -460,7 +461,7 @@ class RiwayatTab extends ConsumerWidget {
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF2D1F17),
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ],
@@ -473,26 +474,26 @@ class RiwayatTab extends ConsumerWidget {
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF9EFE6),
+                      color: AppColors.surfaceElevated,
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
-                          children: [
-                            const Icon(
+                          children: const [
+                            Icon(
                               Icons.qr_code_2,
                               size: 16,
-                              color: Color(0xFFE28743),
+                              color: AppColors.gold,
                             ),
-                            const SizedBox(width: 6),
+                            SizedBox(width: 6),
                             Text(
-                              'QRIS (${ringkasan.qrisJumlah})',
-                              style: const TextStyle(
+                              'QRIS',
+                              style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFFE28743),
+                                color: AppColors.burgundyDeep,
                               ),
                             ),
                           ],
@@ -503,7 +504,7 @@ class RiwayatTab extends ConsumerWidget {
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF2D1F17),
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ],
@@ -534,18 +535,18 @@ class RiwayatTab extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isBatal
-              ? Colors.red.withValues(alpha: 0.3)
-              : const Color(0xFFEBDCD0).withValues(alpha: 0.6),
+              ? AppColors.errorBorder
+              : AppColors.border,
         ),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: const Color(0xFF7C4A2D).withValues(alpha: 0.04),
+            color: AppColors.shadow,
             blurRadius: 10,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -579,15 +580,15 @@ class RiwayatTab extends ConsumerWidget {
                           dateText,
                           style: const TextStyle(
                             fontSize: 12,
-                            color: Color(0xFF9E8D83),
+                            color: AppColors.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                         const SizedBox(width: 8),
                         if (isBatal)
-                          _badge('Batal', Colors.red)
+                          _badge('Batal', AppColors.error)
                         else if (isDiedit)
-                          _badge('Diedit', Colors.orange),
+                          _badge('Diedit', AppColors.warning),
                       ],
                     ),
                     const SizedBox(height: 6),
@@ -599,7 +600,7 @@ class RiwayatTab extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: isBatal ? Colors.grey : const Color(0xFF2D1F17),
+                        color: isBatal ? AppColors.textMuted : AppColors.textPrimary,
                         decoration: isBatal ? TextDecoration.lineThrough : null,
                       ),
                     ),
@@ -615,7 +616,7 @@ class RiwayatTab extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: isBatal ? Colors.grey : AppTheme.primary,
+                      color: isBatal ? AppColors.textMuted : AppColors.burgundy,
                       decoration: isBatal ? TextDecoration.lineThrough : null,
                     ),
                   ),
@@ -624,7 +625,7 @@ class RiwayatTab extends ConsumerWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF9EFE6),
+                      color: AppColors.surfaceElevated,
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
@@ -632,7 +633,7 @@ class RiwayatTab extends ConsumerWidget {
                       style: const TextStyle(
                         fontSize: 10.5,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF6E5A4F),
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ),
@@ -642,7 +643,7 @@ class RiwayatTab extends ConsumerWidget {
               const Icon(
                 Icons.chevron_right,
                 size: 18,
-                color: Color(0xFFB39E91),
+                color: AppColors.textMuted,
               ),
             ],
           ),

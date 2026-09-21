@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../core/app_colors.dart';
 import '../../../../core/network_info.dart';
-import '../../../../core/theme.dart';
 import '../../../../data/models/admin_menu_item.dart';
 import '../../../../providers/admin_provider.dart';
 import '../../../../providers/kategori_provider.dart';
@@ -76,7 +76,7 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal memilih gambar: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Gagal memilih gambar: $e'), backgroundColor: AppColors.error),
         );
       }
     }
@@ -85,6 +85,7 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
   void _showImageSourceDialog() {
     showModalBottomSheet(
       context: context,
+      backgroundColor: AppColors.cardBg,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -92,16 +93,16 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
         child: Wrap(
           children: [
             ListTile(
-              leading: const Icon(Icons.photo_library_outlined, color: AppTheme.primary),
-              title: const Text('Pilih dari Galeri'),
+              leading: const Icon(Icons.photo_library_outlined, color: AppColors.burgundy),
+              title: const Text('Pilih dari Galeri', style: TextStyle(color: AppColors.textDark)),
               onTap: () {
                 Navigator.pop(ctx);
                 _pickImage(ImageSource.gallery);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.camera_alt_outlined, color: AppTheme.primary),
-              title: const Text('Ambil Foto Kamera'),
+              leading: const Icon(Icons.camera_alt_outlined, color: AppColors.burgundy),
+              title: const Text('Ambil Foto Kamera', style: TextStyle(color: AppColors.textDark)),
               onTap: () {
                 Navigator.pop(ctx);
                 _pickImage(ImageSource.camera);
@@ -213,7 +214,7 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Sesi admin telah berakhir. Silakan masukkan PIN kembali.'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
     }
@@ -228,7 +229,7 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
       child: Container(
         constraints: const BoxConstraints(maxWidth: 480),
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: AppColors.cardBg,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: SingleChildScrollView(
@@ -243,7 +244,7 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                   width: 48,
                   height: 5,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEBDCD0),
+                    color: AppColors.border,
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -260,12 +261,12 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                         width: 38,
                         height: 38,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFEE5D4),
+                          color: AppColors.gold.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
                           Icons.edit_note,
-                          color: AppTheme.primary,
+                          color: AppColors.burgundy,
                           size: 22,
                         ),
                       ),
@@ -275,7 +276,7 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: AppTheme.primary,
+                          color: AppColors.burgundy,
                         ),
                       ),
                     ],
@@ -287,10 +288,10 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                       width: 34,
                       height: 34,
                       decoration: const BoxDecoration(
-                        color: Color(0xFFF6ECE3),
+                        color: AppColors.cardBgSecondary,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.close, size: 18, color: Color(0xFF52443D)),
+                      child: const Icon(Icons.close, size: 18, color: AppColors.textDark),
                     ),
                   ),
                 ],
@@ -303,18 +304,18 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFDF0E9),
+                    color: AppColors.errorBg,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFF6C9BA)),
+                    border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.warning_amber_rounded, size: 18, color: Color(0xFFC84C32)),
+                      const Icon(Icons.warning_amber_rounded, size: 18, color: AppColors.error),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           _errorMessage!,
-                          style: const TextStyle(color: Color(0xFFC84C32), fontSize: 13),
+                          style: const TextStyle(color: AppColors.error, fontSize: 13),
                         ),
                       ),
                     ],
@@ -330,16 +331,16 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.8,
-                  color: Color(0xFF6E5A4F),
+                  color: AppColors.textDark,
                 ),
               ),
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFCF5EE),
+                  color: AppColors.cardBgSecondary,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFEBDCD0)),
+                  border: Border.all(color: AppColors.border),
                 ),
                 child: Row(
                   children: [
@@ -349,7 +350,7 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                       child: Container(
                         width: 72,
                         height: 72,
-                        color: const Color(0xFFF3E7DC),
+                        color: AppColors.gold.withValues(alpha: 0.15),
                         child: _imageBytes != null
                             ? Image.memory(
                                 _imageBytes!,
@@ -365,13 +366,13 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                                     fit: BoxFit.cover,
                                     errorBuilder: (ctx, err, stack) => const Icon(
                                       Icons.broken_image_outlined,
-                                      color: Colors.grey,
+                                      color: AppColors.textDisabled,
                                       size: 32,
                                     ),
                                   )
                                 : const Icon(
                                     Icons.restaurant_menu,
-                                    color: Color(0xFFA68B7C),
+                                    color: AppColors.burgundy,
                                     size: 32,
                                   ),
                       ),
@@ -397,8 +398,8 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                             ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.primary,
-                              foregroundColor: Colors.white,
+                              backgroundColor: AppColors.burgundy,
+                              foregroundColor: AppColors.cream,
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                               minimumSize: const Size(0, 34),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -423,7 +424,7 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                                 child: Text(
                                   'Hapus Foto',
                                   style: TextStyle(
-                                    color: Colors.red,
+                                    color: AppColors.error,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -447,7 +448,7 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.8,
-                  color: Color(0xFF6E5A4F),
+                  color: AppColors.textDark,
                 ),
               ),
               const SizedBox(height: 6),
@@ -455,19 +456,19 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                 height: 50,
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFCF5EE),
+                  color: AppColors.cardBgSecondary,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFFEBDCD0)),
+                  border: Border.all(color: AppColors.border),
                 ),
                 child: Center(
                   child: TextField(
                     controller: _namaController,
                     decoration: const InputDecoration(
                       hintText: 'Contoh: Bandrek Original Jahe Merah',
-                      hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
+                      hintStyle: TextStyle(fontSize: 14, color: AppColors.textMuted),
                       border: InputBorder.none,
                     ),
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textDark),
                   ),
                 ),
               ),
@@ -481,7 +482,7 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.8,
-                  color: Color(0xFF6E5A4F),
+                  color: AppColors.textDark,
                 ),
               ),
               const SizedBox(height: 6),
@@ -489,9 +490,9 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                 height: 50,
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFCF5EE),
+                  color: AppColors.cardBgSecondary,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFFEBDCD0)),
+                  border: Border.all(color: AppColors.border),
                 ),
                 child: Row(
                   children: [
@@ -500,7 +501,7 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: AppTheme.primary,
+                        color: AppColors.burgundy,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -511,10 +512,10 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                         decoration: const InputDecoration(
                           hintText: '0',
-                          hintStyle: TextStyle(fontSize: 16, color: Colors.grey),
+                          hintStyle: TextStyle(fontSize: 16, color: AppColors.textMuted),
                           border: InputBorder.none,
                         ),
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textDark),
                       ),
                     ),
                   ],
@@ -530,7 +531,7 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.8,
-                  color: Color(0xFF6E5A4F),
+                  color: AppColors.textDark,
                 ),
               ),
               const SizedBox(height: 6),
@@ -543,16 +544,17 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                     height: 50,
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFCF5EE),
+                      color: AppColors.cardBgSecondary,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFFEBDCD0)),
+                      border: Border.all(color: AppColors.border),
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
                         value: _selectedKategoriId,
                         isExpanded: true,
-                        hint: const Text('Pilih Kategori', style: TextStyle(fontSize: 14)),
-                        icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF84746C)),
+                        dropdownColor: AppColors.cardBg,
+                        hint: const Text('Pilih Kategori', style: TextStyle(fontSize: 14, color: AppColors.textMuted)),
+                        icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.textMuted),
                         items: kategoris.map((k) {
                           return DropdownMenuItem<String>(
                             value: k.id,
@@ -562,12 +564,19 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                                   width: 8,
                                   height: 8,
                                   decoration: const BoxDecoration(
-                                    color: AppTheme.secondary,
+                                    color: AppColors.gold,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
                                 const SizedBox(width: 10),
-                                Text(k.nama, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                                Text(
+                                  k.nama,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                    color: AppColors.textDark,
+                                  ),
+                                ),
                               ],
                             ),
                           );
@@ -584,12 +593,21 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                 loading: () => Container(
                   height: 50,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFCF5EE),
+                    color: AppColors.cardBgSecondary,
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))),
+                  child: const Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.burgundy),
+                    ),
+                  ),
                 ),
-                error: (err, _) => Text('Gagal memuat kategori: $err', style: const TextStyle(color: Colors.red, fontSize: 12)),
+                error: (err, _) => Text(
+                  'Gagal memuat kategori: $err',
+                  style: const TextStyle(color: AppColors.error, fontSize: 12),
+                ),
               ),
 
               const SizedBox(height: 18),
@@ -598,9 +616,9 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFCF5EE),
+                  color: AppColors.cardBgSecondary,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFEBDCD0)),
+                  border: Border.all(color: AppColors.border),
                 ),
                 child: Row(
                   children: [
@@ -610,19 +628,22 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                         children: const [
                           Text(
                             'Tampilkan & Aktif di Kasir',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF2D1F17)),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textDark),
                           ),
                           SizedBox(height: 3),
                           Text(
                             'Menu dapat langsung dipilih kasir saat shift berjalan',
-                            style: TextStyle(fontSize: 11.5, color: Color(0xFF6E5A4F)),
+                            style: TextStyle(fontSize: 11.5, color: AppColors.textMuted),
                           ),
                         ],
                       ),
                     ),
                     Switch(
                       value: _isAktif,
-                      activeThumbColor: AppTheme.secondary,
+                      activeThumbColor: AppColors.gold,
+                      activeTrackColor: AppColors.burgundy,
+                      inactiveThumbColor: AppColors.textDisabled,
+                      inactiveTrackColor: AppColors.cardBg,
                       onChanged: (val) => setState(() => _isAktif = val),
                     ),
                   ],
@@ -640,8 +661,8 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                       child: OutlinedButton(
                         onPressed: _isLoading ? null : () => Navigator.pop(context),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF6E5A4F),
-                          side: const BorderSide(color: Color(0xFFEBDCD0)),
+                          foregroundColor: AppColors.textDark,
+                          side: const BorderSide(color: AppColors.border),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                         ),
                         child: const Text('Batal', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -656,15 +677,15 @@ class _MenuFormSheetState extends ConsumerState<MenuFormSheet> {
                       child: ElevatedButton.icon(
                         onPressed: _isLoading ? null : _simpan,
                         icon: _isLoading
-                            ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                            ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: AppColors.cream, strokeWidth: 2))
                             : const Icon(Icons.check, size: 18),
                         label: Text(
                           _isEdit ? 'Simpan Perubahan' : 'Simpan Menu',
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primary,
-                          foregroundColor: Colors.white,
+                          backgroundColor: AppColors.burgundy,
+                          foregroundColor: AppColors.cream,
                           elevation: 0,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                         ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/app_colors.dart';
 import '../../../core/network_info.dart';
-import '../../../core/theme.dart';
 import '../../../data/models/kategori.dart';
 import '../../../providers/admin_provider.dart';
 import '../../../providers/kategori_provider.dart';
@@ -30,7 +30,7 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Sesi admin telah berakhir. Silakan masukkan PIN kembali.'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
     }
@@ -51,10 +51,11 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
       context: context,
       builder: (dCtx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: AppColors.cardBg,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Text(
             existing != null ? 'Ubah Kategori' : 'Tambah Kategori',
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textDark),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -64,45 +65,57 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFDF0E9),
+                    color: AppColors.errorBg,
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFFF6C9BA)),
+                    border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     dialogError!,
-                    style: const TextStyle(color: Color(0xFFC84C32), fontSize: 12),
+                    style: const TextStyle(color: AppColors.error, fontSize: 12),
                   ),
                 ),
                 const SizedBox(height: 12),
               ],
-              const Text('Nama Kategori', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              const Text('Nama Kategori', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textDark)),
               const SizedBox(height: 6),
               TextField(
                 controller: namaCtrl,
+                style: const TextStyle(color: AppColors.textDark),
                 decoration: InputDecoration(
                   hintText: 'Contoh: Makanan, Minuman',
+                  hintStyle: const TextStyle(color: AppColors.textMuted),
                   filled: true,
-                  fillColor: const Color(0xFFFCF5EE),
+                  fillColor: AppColors.cardBgSecondary,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFEBDCD0)),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.border),
                   ),
                 ),
               ),
               const SizedBox(height: 14),
-              const Text('Nomor Urutan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              const Text('Nomor Urutan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textDark)),
               const SizedBox(height: 6),
               TextField(
                 controller: urutanCtrl,
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                style: const TextStyle(color: AppColors.textDark),
                 decoration: InputDecoration(
                   hintText: '0',
+                  hintStyle: const TextStyle(color: AppColors.textMuted),
                   filled: true,
-                  fillColor: const Color(0xFFFCF5EE),
+                  fillColor: AppColors.cardBgSecondary,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFEBDCD0)),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.border),
                   ),
                 ),
               ),
@@ -111,7 +124,7 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dCtx),
-              child: const Text('Batal'),
+              child: const Text('Batal', style: TextStyle(color: AppColors.textMuted)),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -168,8 +181,8 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.burgundy,
+                foregroundColor: AppColors.cream,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: const Text('Simpan'),
@@ -191,7 +204,7 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
     if (!hasInternet) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(NetworkInfo.offlineMessage), backgroundColor: Colors.red),
+          const SnackBar(content: Text(NetworkInfo.offlineMessage), backgroundColor: AppColors.error),
         );
       }
       return;
@@ -202,7 +215,7 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
       context: context,
       builder: (dCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.cardBg,
         contentPadding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -211,10 +224,10 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
               width: 56,
               height: 56,
               decoration: const BoxDecoration(
-                color: Color(0xFFFEECEB),
+                color: AppColors.errorBg,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.delete_outline_rounded, color: Colors.red, size: 28),
+              child: const Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 28),
             ),
             const SizedBox(height: 16),
             const Text(
@@ -222,7 +235,7 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF2D1F17),
+                color: AppColors.textDark,
               ),
               textAlign: TextAlign.center,
             ),
@@ -231,7 +244,7 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
               'Apakah Anda yakin ingin menghapus kategori "${kategori.nama}"?',
               style: const TextStyle(
                 fontSize: 13.5,
-                color: Color(0xFF7A6B62),
+                color: AppColors.textMuted,
                 height: 1.4,
               ),
               textAlign: TextAlign.center,
@@ -243,8 +256,8 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(dCtx, false),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF5A463B),
-                      backgroundColor: const Color(0xFFF7EFE9),
+                      foregroundColor: AppColors.textDark,
+                      backgroundColor: AppColors.cardBgSecondary,
                       side: BorderSide.none,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -262,8 +275,8 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(dCtx, true),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.shade600,
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.error,
+                      foregroundColor: AppColors.cream,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -309,7 +322,7 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(errStr.replaceAll('Exception:', '').trim()),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -331,8 +344,12 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
       context: context,
       builder: (dCtx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: AppColors.cardBg,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Text('Ubah PIN Admin', style: TextStyle(fontWeight: FontWeight.bold)),
+          title: const Text(
+            'Ubah PIN Admin',
+            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textDark),
+          ),
           content: SizedBox(
             width: 320,
             child: SingleChildScrollView(
@@ -344,18 +361,18 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFDF0E9),
+                      color: AppColors.errorBg,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0xFFF6C9BA)),
+                      border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
                     ),
                     child: Text(
                       dialogError!,
-                      style: const TextStyle(color: Color(0xFFC84C32), fontSize: 12),
+                      style: const TextStyle(color: AppColors.error, fontSize: 12),
                     ),
                   ),
                   const SizedBox(height: 12),
                 ],
-                const Text('PIN Lama', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                const Text('PIN Lama', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textDark)),
                 const SizedBox(height: 6),
                 TextField(
                   controller: lamaCtrl,
@@ -363,19 +380,25 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                   obscureText: true,
                   maxLength: 6,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  style: const TextStyle(color: AppColors.textDark),
                   decoration: InputDecoration(
                     counterText: '',
                     hintText: '6 digit PIN saat ini',
+                    hintStyle: const TextStyle(color: AppColors.textMuted),
                     filled: true,
-                    fillColor: const Color(0xFFFCF5EE),
+                    fillColor: AppColors.cardBgSecondary,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFFEBDCD0)),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.border),
                     ),
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Text('PIN Baru', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                const Text('PIN Baru', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textDark)),
                 const SizedBox(height: 6),
                 TextField(
                   controller: baruCtrl,
@@ -383,19 +406,25 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                   obscureText: true,
                   maxLength: 6,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  style: const TextStyle(color: AppColors.textDark),
                   decoration: InputDecoration(
                     counterText: '',
                     hintText: '6 digit angka baru',
+                    hintStyle: const TextStyle(color: AppColors.textMuted),
                     filled: true,
-                    fillColor: const Color(0xFFFCF5EE),
+                    fillColor: AppColors.cardBgSecondary,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFFEBDCD0)),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.border),
                     ),
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Text('Konfirmasi PIN Baru', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                const Text('Konfirmasi PIN Baru', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textDark)),
                 const SizedBox(height: 6),
                 TextField(
                   controller: konfirmasiCtrl,
@@ -403,14 +432,20 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                   obscureText: true,
                   maxLength: 6,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  style: const TextStyle(color: AppColors.textDark),
                   decoration: InputDecoration(
                     counterText: '',
                     hintText: 'Ulangi 6 digit PIN baru',
+                    hintStyle: const TextStyle(color: AppColors.textMuted),
                     filled: true,
-                    fillColor: const Color(0xFFFCF5EE),
+                    fillColor: AppColors.cardBgSecondary,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFFEBDCD0)),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.border),
                     ),
                   ),
                 ),
@@ -421,7 +456,7 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
           actions: [
             TextButton(
               onPressed: isSaving ? null : () => Navigator.pop(dCtx),
-              child: const Text('Batal'),
+              child: const Text('Batal', style: TextStyle(color: AppColors.textMuted)),
             ),
             ElevatedButton(
               onPressed: isSaving
@@ -490,12 +525,12 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                       }
                     },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.burgundy,
+                foregroundColor: AppColors.cream,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: isSaving
-                  ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.cream))
                   : const Text('Simpan PIN'),
             ),
           ],
@@ -513,7 +548,7 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
       context: context,
       builder: (dCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.cardBg,
         contentPadding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -522,10 +557,10 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
               width: 56,
               height: 56,
               decoration: const BoxDecoration(
-                color: Color(0xFFFEECEB),
+                color: AppColors.errorBg,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.logout_rounded, color: Colors.red, size: 28),
+              child: const Icon(Icons.logout_rounded, color: AppColors.error, size: 28),
             ),
             const SizedBox(height: 16),
             const Text(
@@ -533,7 +568,7 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF2D1F17),
+                color: AppColors.textDark,
               ),
               textAlign: TextAlign.center,
             ),
@@ -542,7 +577,7 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
               'Apakah Anda yakin ingin keluar dari Mode Admin dan kembali ke Kasir?',
               style: TextStyle(
                 fontSize: 13.5,
-                color: Color(0xFF7A6B62),
+                color: AppColors.textMuted,
                 height: 1.4,
               ),
               textAlign: TextAlign.center,
@@ -554,8 +589,8 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(dCtx, false),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF5A463B),
-                      backgroundColor: const Color(0xFFF7EFE9),
+                      foregroundColor: AppColors.textDark,
+                      backgroundColor: AppColors.cardBgSecondary,
                       side: BorderSide.none,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -573,8 +608,8 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(dCtx, true),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.shade600,
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.error,
+                      foregroundColor: AppColors.cream,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -620,11 +655,17 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
     final kategoriAsync = ref.watch(kategoriProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9EFE6),
+      backgroundColor: AppColors.scaffoldBg,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Pengaturan Admin', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
+        title: const Text(
+          'Pengaturan Admin',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.cream,
+          ),
+        ),
+        backgroundColor: AppColors.appBarBg,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -635,13 +676,14 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
             // Section 1: Kelola Kategori
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.cardBg,
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: [
+                border: Border.all(color: AppColors.border),
+                boxShadow: const [
                   BoxShadow(
-                    color: const Color(0xFF7C4A2D).withValues(alpha: 0.05),
+                    color: AppColors.shadowColor,
                     blurRadius: 10,
-                    offset: const Offset(0, 2),
+                    offset: Offset(0, 2),
                   ),
                 ],
               ),
@@ -655,11 +697,11 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                       children: [
                         Row(
                           children: const [
-                            Icon(Icons.category_outlined, color: AppTheme.primary, size: 20),
+                            Icon(Icons.category_outlined, color: AppColors.burgundy, size: 20),
                             SizedBox(width: 8),
                             Text(
                               'Kelola Kategori',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D1F17)),
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textDark),
                             ),
                           ],
                         ),
@@ -668,7 +710,7 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                           icon: const Icon(Icons.add, size: 16),
                           label: const Text('Tambah'),
                           style: TextButton.styleFrom(
-                            foregroundColor: AppTheme.primary,
+                            foregroundColor: AppColors.burgundy,
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           ),
                         ),
@@ -681,7 +723,7 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                       if (kategoris.isEmpty) {
                         return const Padding(
                           padding: EdgeInsets.all(20),
-                          child: Center(child: Text('Belum ada kategori.')),
+                          child: Center(child: Text('Belum ada kategori.', style: TextStyle(color: AppColors.textMuted))),
                         );
                       }
                       return ListView.separated(
@@ -698,26 +740,26 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                               width: 32,
                               height: 32,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFEE5D4),
+                                color: AppColors.gold.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Center(
                                 child: Text(
                                   '${k.urutan}',
-                                  style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary, fontSize: 13),
+                                  style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.burgundy, fontSize: 13),
                                 ),
                               ),
                             ),
-                            title: Text(k.nama, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                            title: Text(k.nama, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: AppColors.textDark)),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.edit_outlined, size: 18, color: AppTheme.primary),
+                                  icon: const Icon(Icons.edit_outlined, size: 18, color: AppColors.burgundy),
                                   onPressed: () => _showKategoriDialog(k),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete_outline, size: 18, color: Colors.red),
+                                  icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
                                   onPressed: () => _hapusKategori(k),
                                 ),
                               ],
@@ -728,11 +770,11 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                     },
                     loading: () => const Padding(
                       padding: EdgeInsets.all(20),
-                      child: Center(child: CircularProgressIndicator()),
+                      child: Center(child: CircularProgressIndicator(color: AppColors.burgundy)),
                     ),
                     error: (err, _) => Padding(
                       padding: const EdgeInsets.all(16),
-                      child: Text('Gagal memuat kategori: $err', style: const TextStyle(color: Colors.red)),
+                      child: Text('Gagal memuat kategori: $err', style: const TextStyle(color: AppColors.error)),
                     ),
                   ),
                 ],
@@ -744,13 +786,14 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
             // Section 2: Keamanan (Ubah PIN)
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.cardBg,
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: [
+                border: Border.all(color: AppColors.border),
+                boxShadow: const [
                   BoxShadow(
-                    color: const Color(0xFF7C4A2D).withValues(alpha: 0.05),
+                    color: AppColors.shadowColor,
                     blurRadius: 10,
-                    offset: const Offset(0, 2),
+                    offset: Offset(0, 2),
                   ),
                 ],
               ),
@@ -763,14 +806,14 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFEE5D4),
+                      color: AppColors.gold.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.pin_outlined, color: AppTheme.primary, size: 22),
+                    child: const Icon(Icons.pin_outlined, color: AppColors.burgundy, size: 22),
                   ),
-                  title: const Text('Ubah PIN Admin', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                  subtitle: const Text('Ganti 6 digit PIN untuk akses admin', style: TextStyle(fontSize: 12, color: Color(0xFF6E5A4F))),
-                  trailing: const Icon(Icons.chevron_right, color: Color(0xFFB39E91)),
+                  title: const Text('Ubah PIN Admin', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.textDark)),
+                  subtitle: const Text('Ganti 6 digit PIN untuk akses admin', style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                  trailing: const Icon(Icons.chevron_right, color: AppColors.textMuted),
                   onTap: _showUbahPinDialog,
                 ),
               ),
@@ -783,15 +826,15 @@ class _PengaturanTabState extends ConsumerState<PengaturanTab> {
               height: 52,
               child: OutlinedButton.icon(
                 onPressed: _isLoading ? null : _keluarAdmin,
-                icon: const Icon(Icons.logout, color: Colors.red),
+                icon: const Icon(Icons.logout, color: AppColors.error),
                 label: const Text(
                   'Keluar dari Mode Admin',
-                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 15),
+                  style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold, fontSize: 15),
                 ),
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.red, width: 1.5),
+                  side: const BorderSide(color: AppColors.error, width: 1.5),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  backgroundColor: Colors.white,
+                  backgroundColor: AppColors.cardBg,
                 ),
               ),
             ),

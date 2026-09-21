@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/app_colors.dart';
 import '../../../core/format.dart';
 import '../../../core/network_info.dart';
-import '../../../core/theme.dart';
 import '../../../data/models/transaksi.dart';
 import '../../../providers/admin_laporan_provider.dart';
 import '../../../providers/admin_log_provider.dart';
@@ -38,7 +38,7 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
     if (!hasInternet) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(NetworkInfo.offlineMessage), backgroundColor: Colors.red),
+          const SnackBar(content: Text(NetworkInfo.offlineMessage), backgroundColor: AppColors.error),
         );
       }
       return;
@@ -80,7 +80,7 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
     if (!hasInternet) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(NetworkInfo.offlineMessage), backgroundColor: Colors.red),
+          const SnackBar(content: Text(NetworkInfo.offlineMessage), backgroundColor: AppColors.error),
         );
       }
       return;
@@ -90,21 +90,23 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
     final confirm = await showDialog<bool>(
       context: context,
       builder: (dCtx) => AlertDialog(
-        title: const Text('Batalkan Transaksi'),
+        backgroundColor: AppColors.cardBg,
+        title: const Text('Batalkan Transaksi', style: TextStyle(color: AppColors.textDark)),
         content: const Text(
           'Apakah Anda yakin ingin membatalkan transaksi ini?\n\n'
           'Status transaksi akan diubah menjadi Batal dan tidak dihitung ke total penjualan. Tindakan ini tidak bisa diurungkan.',
+          style: TextStyle(color: AppColors.textMuted),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dCtx, false),
-            child: const Text('Kembali'),
+            child: const Text('Kembali', style: TextStyle(color: AppColors.textDark)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(dCtx, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: AppColors.error,
+              foregroundColor: AppColors.cream,
             ),
             child: const Text('Ya, Batalkan'),
           ),
@@ -147,7 +149,7 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(errStr.replaceAll('Exception:', '').trim()),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -164,7 +166,7 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Sesi admin telah berakhir. Silakan masukkan PIN kembali.'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
     }
@@ -185,7 +187,7 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
         expand: false,
         builder: (_, scrollController) => Container(
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -197,7 +199,7 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
                   width: 44,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFD7C2B9),
+                    color: AppColors.divider,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -217,19 +219,19 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
                             children: [
                               Text(
                                 AppFormat.dateTime(t.createdAt.toLocal()),
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.textPrimary),
                               ),
                               const SizedBox(width: 8),
                               if (isBatal)
-                                _badge('Batal', Colors.red)
+                                _badge('Batal', AppColors.error)
                               else if (isDiedit)
-                                _badge('Diedit', Colors.orange),
+                                _badge('Diedit', AppColors.warning),
                             ],
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Metode: ${t.metodeBayar.toUpperCase()}',
-                            style: const TextStyle(fontSize: 13, color: Color(0xFF6E5A4F)),
+                            style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                           ),
                         ],
                       ),
@@ -245,7 +247,7 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: isBatal ? Colors.grey : AppTheme.primary,
+                                color: isBatal ? AppColors.textMuted : AppColors.burgundy,
                                 decoration: isBatal ? TextDecoration.lineThrough : null,
                               ),
                             ),
@@ -257,10 +259,10 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
                                 width: 30,
                                 height: 30,
                                 decoration: const BoxDecoration(
-                                  color: Color(0xFFF6ECE3),
+                                  color: AppColors.surfaceElevated,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.close, size: 16, color: Color(0xFF52443D)),
+                                child: const Icon(Icons.close, size: 16, color: AppColors.textPrimary),
                               ),
                             ),
                           ],
@@ -279,8 +281,8 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: const [
-                    Text('Item Pesanan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF6E5A4F))),
-                    Text('Subtotal', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF6E5A4F))),
+                    Text('Item Pesanan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textSecondary)),
+                    Text('Subtotal', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textSecondary)),
                   ],
                 ),
               ),
@@ -300,7 +302,7 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
                           width: 28,
                           height: 28,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFEE5D4),
+                            color: AppColors.goldTint,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Center(
@@ -308,7 +310,7 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
                               '${item.qty}',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF7C4A2D),
+                                color: AppColors.burgundyDeep,
                                 fontSize: 13,
                               ),
                             ),
@@ -324,13 +326,13 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
-                                  color: isBatal ? Colors.grey : Colors.black87,
+                                  color: isBatal ? AppColors.textMuted : AppColors.textPrimary,
                                   decoration: isBatal ? TextDecoration.lineThrough : null,
                                 ),
                               ),
                               Text(
                                 '${AppFormat.currency(item.hargaSatuan)} / pcs',
-                                style: const TextStyle(fontSize: 11, color: Colors.grey),
+                                style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                               ),
                             ],
                           ),
@@ -340,7 +342,7 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
-                            color: isBatal ? Colors.grey : Colors.black87,
+                            color: isBatal ? AppColors.textMuted : AppColors.textPrimary,
                             decoration: isBatal ? TextDecoration.lineThrough : null,
                           ),
                         ),
@@ -358,13 +360,13 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: Colors.red.withValues(alpha: 0.1),
+                          color: AppColors.errorBg,
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: const Center(
                           child: Text(
                             'Transaksi ini telah dibatalkan',
-                            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                            style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold),
                           ),
                         ),
                       )
@@ -379,8 +381,8 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
                                 icon: const Icon(Icons.edit_outlined),
                                 label: const Text('Edit'),
                                 style: OutlinedButton.styleFrom(
-                                  foregroundColor: AppTheme.primary,
-                                  side: const BorderSide(color: AppTheme.primary),
+                                  foregroundColor: AppColors.burgundy,
+                                  side: const BorderSide(color: AppColors.burgundy),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                                 ),
                               ),
@@ -397,13 +399,13 @@ class _AdminTransaksiDetailSheetState extends ConsumerState<AdminTransaksiDetail
                                     ? const SizedBox(
                                         width: 18,
                                         height: 18,
-                                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                        child: CircularProgressIndicator(color: AppColors.cream, strokeWidth: 2),
                                       )
                                     : const Icon(Icons.cancel_outlined),
                                 label: const Text('Batalkan'),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  foregroundColor: Colors.white,
+                                  backgroundColor: AppColors.error,
+                                  foregroundColor: AppColors.cream,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                                 ),

@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'app_colors.dart';
 
 class AppTheme {
-  // Colors
-  static const Color surface = Color(0xFFFFF8F3);
-  static const Color surfaceDim = Color(0xFFE2D8D0);
-  static const Color primary = Color(0xFF7C4A2D);
-  static const Color onPrimary = Color(0xFFFFFFFF);
-  static const Color secondary = Color(0xFFE28743);
-  static const Color onSecondary = Color(0xFFFFFFFF);
-  static const Color tertiary = Color(0xFFFEE5D4);
-  static const Color onTertiary = Color(0xFF7C4A2D); // Matching text for tertiary fill
-  static const Color neutral = Color(0xFFF9EFE6);
-  static const Color outline = Color(0xFF84746C);
-  static const Color error = Color(0xFFBA1A1A);
-  static const Color onError = Color(0xFFFFFFFF);
+  // Aliases for compatibility
+  static const Color surface = AppColors.surface;
+  static const Color surfaceDim = AppColors.surfaceDim;
+  static const Color primary = AppColors.burgundy;
+  static const Color onPrimary = AppColors.cream;
+  static const Color secondary = AppColors.gold;
+  static const Color onSecondary = AppColors.burgundyDeep;
+  static const Color tertiary = AppColors.goldTint;
+  static const Color onTertiary = AppColors.burgundyDeep;
+  static const Color neutral = AppColors.cream;
+  static const Color outline = AppColors.border;
+  static const Color error = AppColors.error;
+  static const Color onError = AppColors.cream;
 
   static ThemeData get lightTheme {
     final baseTextTheme = GoogleFonts.plusJakartaSansTextTheme();
@@ -22,31 +23,40 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: const ColorScheme.light(
-        primary: primary,
-        onPrimary: onPrimary,
-        secondary: secondary,
-        onSecondary: onSecondary,
-        tertiary: tertiary,
-        onTertiary: onTertiary,
-        surface: surface,
-        onSurface: Color(0xFF1F1B16),
-        error: error,
-        onError: onError,
-        outline: outline,
+        primary: AppColors.burgundy,
+        onPrimary: AppColors.cream,
+        secondary: AppColors.gold,
+        onSecondary: AppColors.burgundyDeep,
+        tertiary: AppColors.goldTint,
+        onTertiary: AppColors.burgundyDeep,
+        surface: AppColors.surface,
+        onSurface: AppColors.textPrimary,
+        error: AppColors.error,
+        onError: AppColors.cream,
+        outline: AppColors.border,
       ),
-      scaffoldBackgroundColor: neutral,
-      textTheme: baseTextTheme,
+      scaffoldBackgroundColor: AppColors.background,
+      textTheme: baseTextTheme.apply(
+        bodyColor: AppColors.textPrimary,
+        displayColor: AppColors.textPrimary,
+      ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: surface,
-        foregroundColor: primary,
+        backgroundColor: AppColors.appBarBg,
+        foregroundColor: AppColors.cream,
         elevation: 0,
         centerTitle: false,
+        iconTheme: IconThemeData(color: AppColors.cream),
+        titleTextStyle: TextStyle(
+          color: AppColors.cream,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: secondary,
-          foregroundColor: onSecondary,
-          minimumSize: const Size.fromHeight(52),
+          backgroundColor: AppColors.burgundy,
+          foregroundColor: AppColors.cream,
+          minimumSize: const Size(64, 48),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -56,12 +66,31 @@ class AppTheme {
           ),
         ),
       ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.burgundy,
+          side: const BorderSide(color: AppColors.burgundy),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: AppColors.bottomNavBg,
+        selectedItemColor: AppColors.gold,
+        unselectedItemColor: AppColors.textOnDarkMuted,
+      ),
       cardTheme: CardThemeData(
-        color: Colors.white,
+        color: AppColors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: AppColors.border),
         ),
+      ),
+      dividerTheme: const DividerThemeData(
+        color: AppColors.divider,
+        thickness: 1,
       ),
     );
   }

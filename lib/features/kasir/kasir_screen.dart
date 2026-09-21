@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/app_colors.dart';
 import '../../core/format.dart';
-import '../../core/theme.dart';
 import '../../data/models/menu.dart';
 import '../../data/models/transaksi.dart';
 import '../../data/models/transaksi_item.dart';
@@ -67,7 +67,7 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Butuh internet untuk mengubah transaksi yang sudah terkirim'),
-                backgroundColor: Colors.orange,
+                backgroundColor: AppColors.warning,
               ),
             );
           }
@@ -86,7 +86,7 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString().replaceAll('Exception:', '').trim()), backgroundColor: Colors.red),
+          SnackBar(content: Text(e.toString().replaceAll('Exception:', '').trim()), backgroundColor: AppColors.error),
         );
       }
     }
@@ -136,17 +136,17 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
                   MaterialPageRoute(builder: (_) => const PinGateScreen()),
                 );
               },
-              icon: const Icon(Icons.lock_outline, size: 16, color: AppTheme.primary),
+              icon: const Icon(Icons.lock_outline, size: 16, color: AppColors.cream),
               label: const Text(
                 'Login',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 13,
-                  color: AppTheme.primary,
+                  color: AppColors.cream,
                 ),
               ),
               style: TextButton.styleFrom(
-                backgroundColor: AppTheme.tertiary,
+                backgroundColor: AppColors.burgundy,
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
@@ -177,7 +177,7 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
                     width: 9,
                     height: 9,
                     decoration: BoxDecoration(
-                      color: isOnline ? Colors.green : Colors.orange,
+                      color: isOnline ? AppColors.success : AppColors.warning,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -187,7 +187,7 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: isOnline ? Colors.black87 : Colors.orange.shade800,
+                      color: isOnline ? AppColors.cream : AppColors.warningBorder,
                     ),
                   ),
                   if (pendingCount > 0) ...[
@@ -195,7 +195,7 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.orange.withValues(alpha: 0.2),
+                        color: AppColors.warningBg,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
@@ -203,7 +203,7 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
                         style: const TextStyle(
                           fontSize: 10.5,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFFC84C32),
+                          color: AppColors.warning,
                         ),
                       ),
                     ),
@@ -288,9 +288,9 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
               right: 0,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppTheme.surface,
-                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.07), offset: const Offset(0, -4), blurRadius: 12)],
+                decoration: const BoxDecoration(
+                  color: AppColors.surface,
+                  boxShadow: [BoxShadow(color: AppColors.shadow, offset: Offset(0, -4), blurRadius: 12)],
                 ),
                 child: SafeArea(
                   top: false,
@@ -301,10 +301,10 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text('$totalItem item', style: const TextStyle(fontSize: 13, color: Colors.black54)),
+                            Text('$totalItem item', style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
                             Text(
                               AppFormat.currency(totalHarga),
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primary),
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.burgundy),
                             ),
                           ],
                         ),
@@ -326,9 +326,9 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
       floatingActionButton: totalItem == 0
           ? FloatingActionButton.extended(
               onPressed: () => _openCart(context),
-              backgroundColor: AppTheme.secondary,
-              icon: const Icon(Icons.shopping_cart_outlined, color: Colors.white),
-              label: const Text('Pesanan', style: TextStyle(color: Colors.white)),
+              backgroundColor: AppColors.burgundy,
+              icon: const Icon(Icons.shopping_cart_outlined, color: AppColors.cream),
+              label: const Text('Pesanan', style: TextStyle(color: AppColors.cream)),
             )
           : null,
     );
@@ -338,20 +338,20 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
     return Material(
       elevation: 6,
       borderRadius: BorderRadius.circular(14),
-      color: AppTheme.primary,
+      color: AppColors.burgundy,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         child: Row(
           children: [
-            const Icon(Icons.check_circle, color: Colors.white, size: 20),
+            const Icon(Icons.check_circle, color: AppColors.cream, size: 20),
             const SizedBox(width: 8),
             const Expanded(
-              child: Text('Transaksi tersimpan', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+              child: Text('Transaksi tersimpan', style: TextStyle(color: AppColors.cream, fontWeight: FontWeight.w600)),
             ),
             TextButton(
               onPressed: () => _ubahLast(ctx),
               style: TextButton.styleFrom(
-                foregroundColor: Colors.amber,
+                foregroundColor: AppColors.gold,
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 minimumSize: const Size(48, 36),
               ),
@@ -360,7 +360,7 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
             TextButton(
               onPressed: _batalkanLast,
               style: TextButton.styleFrom(
-                foregroundColor: Colors.red[200],
+                foregroundColor: AppColors.errorBorder,
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 minimumSize: const Size(56, 36),
               ),
@@ -379,9 +379,10 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
         label: Text(label),
         selected: isSelected,
         onSelected: (_) => setState(() => _selectedKategoriId = id),
-        selectedColor: AppTheme.tertiary,
+        selectedColor: AppColors.burgundy,
+        backgroundColor: AppColors.surfaceElevated,
         labelStyle: TextStyle(
-          color: isSelected ? AppTheme.onTertiary : Colors.black87,
+          color: isSelected ? AppColors.cream : AppColors.textPrimary,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),
       ),
@@ -398,8 +399,8 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: qty > 0
-            ? const BorderSide(color: AppTheme.primary, width: 2)
-            : BorderSide(color: Colors.black.withValues(alpha: 0.06)),
+            ? const BorderSide(color: AppColors.burgundy, width: 2)
+            : const BorderSide(color: AppColors.border),
       ),
       child: InkWell(
         onTap: () => ref.read(cartProvider.notifier).addMenu(menu),
@@ -427,20 +428,20 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: AppTheme.primary,
+                          color: AppColors.burgundy,
                           borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
+                          boxShadow: const [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.25),
+                              color: AppColors.shadowDark,
                               blurRadius: 4,
-                              offset: const Offset(0, 2),
+                              offset: Offset(0, 2),
                             ),
                           ],
                         ),
                         child: Text(
                           '$qty',
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.cream,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
@@ -472,7 +473,7 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.primary,
+                            color: AppColors.burgundy,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -482,9 +483,9 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
                       if (qty > 0)
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF4EBE3),
+                            color: AppColors.surfaceElevated,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: const Color(0xFFE2CCBA)),
+                            border: Border.all(color: AppColors.border),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -496,7 +497,7 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
                                   borderRadius: BorderRadius.circular(16),
                                   child: const Padding(
                                     padding: EdgeInsets.all(4),
-                                    child: Icon(Icons.remove, size: 16, color: AppTheme.primary),
+                                    child: Icon(Icons.remove, size: 16, color: AppColors.burgundy),
                                   ),
                                 ),
                               ),
@@ -507,7 +508,7 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
                                   style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold,
-                                    color: AppTheme.primary,
+                                    color: AppColors.burgundy,
                                   ),
                                 ),
                               ),
@@ -518,7 +519,7 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
                                   borderRadius: BorderRadius.circular(16),
                                   child: const Padding(
                                     padding: EdgeInsets.all(4),
-                                    child: Icon(Icons.add, size: 16, color: AppTheme.primary),
+                                    child: Icon(Icons.add, size: 16, color: AppColors.burgundy),
                                   ),
                                 ),
                               ),
@@ -529,10 +530,10 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
                         Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                            color: AppTheme.primary.withValues(alpha: 0.1),
+                            color: AppColors.burgundy.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.add, size: 16, color: AppTheme.primary),
+                          child: const Icon(Icons.add, size: 16, color: AppColors.burgundy),
                         ),
                     ],
                   ),
@@ -547,11 +548,11 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
 
   Widget _buildPlaceholderPhoto() {
     return Container(
-      color: const Color(0xFFF7EDE3),
+      color: AppColors.surfaceElevated,
       child: const Center(
         child: Icon(
           Icons.restaurant_menu_rounded,
-          color: Color(0xFFC7A896),
+          color: AppColors.textMuted,
           size: 36,
         ),
       ),

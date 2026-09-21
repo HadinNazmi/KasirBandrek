@@ -2,8 +2,8 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/app_colors.dart';
 import '../../../../core/format.dart';
-import '../../../../core/theme.dart';
 import '../../../../data/models/laporan_penjualan.dart';
 
 class TrenPenjualanChart extends StatelessWidget {
@@ -18,24 +18,24 @@ class TrenPenjualanChart extends StatelessWidget {
   Widget build(BuildContext context) {
     if (dataHarian.isEmpty) {
       return Card(
-        color: Colors.white,
+        color: AppColors.cardBg,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: AppTheme.surfaceDim.withValues(alpha: 0.5)),
+          side: const BorderSide(color: AppColors.border),
         ),
         child: const Padding(
           padding: EdgeInsets.symmetric(vertical: 36, horizontal: 16),
           child: Center(
             child: Column(
               children: [
-                Icon(Icons.show_chart, size: 40, color: AppTheme.outline),
+                Icon(Icons.show_chart, size: 40, color: AppColors.textMuted),
                 SizedBox(height: 8),
                 Text(
                   'Belum ada data grafik penjualan pada periode ini',
                   style: TextStyle(
                     fontSize: 13,
-                    color: AppTheme.outline,
+                    color: AppColors.textMuted,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -64,11 +64,11 @@ class TrenPenjualanChart extends StatelessWidget {
     final trendInfo = _calculateTrend(sortedData);
 
     return Card(
-      color: Colors.white,
+      color: AppColors.cardBg,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: AppTheme.surfaceDim.withValues(alpha: 0.5)),
+        side: const BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -86,7 +86,7 @@ class TrenPenjualanChart extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF1F1B16),
+                        color: AppColors.textDark,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -94,7 +94,7 @@ class TrenPenjualanChart extends StatelessWidget {
                       '${sortedData.length} hari terdata',
                       style: const TextStyle(
                         fontSize: 12,
-                        color: AppTheme.outline,
+                        color: AppColors.textMuted,
                       ),
                     ),
                   ],
@@ -107,10 +107,10 @@ class TrenPenjualanChart extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: trendInfo.isUp
-                          ? const Color(0xFFE8F5E9)
+                          ? AppColors.successBg
                           : (trendInfo.isNeutral
-                              ? const Color(0xFFF5F5F5)
-                              : const Color(0xFFFFEBEE)),
+                              ? AppColors.cardBgSecondary
+                              : AppColors.errorBg),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -124,10 +124,10 @@ class TrenPenjualanChart extends StatelessWidget {
                                   : Icons.trending_down),
                           size: 16,
                           color: trendInfo.isUp
-                              ? const Color(0xFF2E7D32)
+                              ? AppColors.success
                               : (trendInfo.isNeutral
-                                  ? Colors.grey.shade700
-                                  : const Color(0xFFC62828)),
+                                  ? AppColors.textMuted
+                                  : AppColors.error),
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -136,10 +136,10 @@ class TrenPenjualanChart extends StatelessWidget {
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: trendInfo.isUp
-                                ? const Color(0xFF2E7D32)
+                                ? AppColors.success
                                 : (trendInfo.isNeutral
-                                    ? Colors.grey.shade700
-                                    : const Color(0xFFC62828)),
+                                    ? AppColors.textMuted
+                                    : AppColors.error),
                           ),
                         ),
                       ],
@@ -161,7 +161,7 @@ class TrenPenjualanChart extends StatelessWidget {
                     drawVerticalLine: false,
                     horizontalInterval: chartMaxY / 4 > 0 ? chartMaxY / 4 : 1,
                     getDrawingHorizontalLine: (value) => FlLine(
-                      color: AppTheme.surfaceDim.withValues(alpha: 0.4),
+                      color: AppColors.border,
                       strokeWidth: 1,
                       dashArray: [4, 4],
                     ),
@@ -186,7 +186,7 @@ class TrenPenjualanChart extends StatelessWidget {
                               _formatCompactY(value),
                               style: const TextStyle(
                                 fontSize: 10,
-                                color: AppTheme.outline,
+                                color: AppColors.textMuted,
                               ),
                               textAlign: TextAlign.right,
                             ),
@@ -211,7 +211,7 @@ class TrenPenjualanChart extends StatelessWidget {
                               DateFormat('dd/MM').format(date),
                               style: const TextStyle(
                                 fontSize: 10,
-                                color: AppTheme.outline,
+                                color: AppColors.textMuted,
                               ),
                             ),
                           );
@@ -223,7 +223,7 @@ class TrenPenjualanChart extends StatelessWidget {
                   lineTouchData: LineTouchData(
                     handleBuiltInTouches: true,
                     touchTooltipData: LineTouchTooltipData(
-                      getTooltipColor: (_) => AppTheme.primary,
+                      getTooltipColor: (_) => AppColors.burgundyDark,
                       tooltipRoundedRadius: 8,
                       getTooltipItems: (touchedSpots) {
                         return touchedSpots.map((spot) {
@@ -237,7 +237,7 @@ class TrenPenjualanChart extends StatelessWidget {
                           return LineTooltipItem(
                             '$dateStr\n${AppFormat.currency(item.total)}\n(${item.jumlahTransaksi} trx)',
                             const TextStyle(
-                              color: Colors.white,
+                              color: AppColors.cream,
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
                               height: 1.3,
@@ -255,7 +255,7 @@ class TrenPenjualanChart extends StatelessWidget {
                       ],
                       isCurved: sortedData.length > 2,
                       curveSmoothness: 0.35,
-                      color: AppTheme.primary,
+                      color: AppColors.burgundy,
                       barWidth: 3,
                       isStrokeCapRound: true,
                       dotData: FlDotData(
@@ -263,9 +263,9 @@ class TrenPenjualanChart extends StatelessWidget {
                         getDotPainter: (spot, percent, barData, index) =>
                             FlDotCirclePainter(
                           radius: 3.5,
-                          color: Colors.white,
+                          color: AppColors.cardBg,
                           strokeWidth: 2,
-                          strokeColor: AppTheme.primary,
+                          strokeColor: AppColors.burgundy,
                         ),
                       ),
                       belowBarData: BarAreaData(
@@ -274,8 +274,8 @@ class TrenPenjualanChart extends StatelessWidget {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            AppTheme.primary.withValues(alpha: 0.28),
-                            AppTheme.primary.withValues(alpha: 0.0),
+                            AppColors.burgundy.withValues(alpha: 0.28),
+                            AppColors.burgundy.withValues(alpha: 0.0),
                           ],
                         ),
                       ),

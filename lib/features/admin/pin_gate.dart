@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/app_colors.dart';
 import '../../core/network_info.dart';
 import '../../providers/admin_provider.dart';
 import '../../providers/supabase_provider.dart';
@@ -67,7 +68,7 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(NetworkInfo.offlineMessage),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
         setState(() => _pin = '');
@@ -151,7 +152,7 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4EBE3),
+      backgroundColor: AppColors.background,
       body: PopScope(
         canPop: true,
         onPopInvokedWithResult: (didPop, result) {
@@ -165,7 +166,7 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
           child: Center(
             child: Container(
               constraints: const BoxConstraints(maxWidth: 480),
-              color: const Color(0xFFFAF1E8),
+              color: AppColors.background,
               child: Column(
                 children: [
                   // Top Navigation Bar
@@ -190,27 +191,27 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
                             width: 44,
                             height: 44,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.surface,
                               shape: BoxShape.circle,
-                              border: Border.all(color: const Color(0xFFEBDCD0)),
-                              boxShadow: [
+                              border: Border.all(color: AppColors.border),
+                              boxShadow: const [
                                 BoxShadow(
-                                  color: const Color(0xFF5C351E).withValues(alpha: 0.08),
+                                  color: AppColors.shadow,
                                   blurRadius: 6,
-                                  offset: const Offset(0, 2),
+                                  offset: Offset(0, 2),
                                 ),
                               ],
                             ),
-                            child: const Icon(Icons.arrow_back_ios_new, size: 18, color: Color(0xFF2D1F17)),
+                            child: const Icon(Icons.arrow_back_ios_new, size: 18, color: AppColors.textPrimary),
                           ),
                         ),
                       // Status Badge
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: AppColors.surface.withValues(alpha: 0.9),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFEBDCD0)),
+                          border: Border.all(color: AppColors.border),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -219,7 +220,7 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
                               width: 8,
                               height: 8,
                               decoration: const BoxDecoration(
-                                color: Color(0xFFE28743),
+                                color: AppColors.gold,
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -228,8 +229,8 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
                               'Kedai Bandrek • Mode Admin',
                               style: TextStyle(
                                 fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF6E5A4F),
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
                               ),
                             ),
                           ],
@@ -258,7 +259,7 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
                         child: const Text(
                           'Bantuan',
                           style: TextStyle(
-                            color: Color(0xFFE28743),
+                            color: AppColors.burgundy,
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
                           ),
@@ -284,16 +285,16 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               gradient: const LinearGradient(
-                                colors: [Color(0xFFFFFDFB), Color(0xFFFCEFE5)],
+                                colors: [AppColors.surface, AppColors.surfaceElevated],
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                               ),
-                              border: Border.all(color: Colors.white, width: 2),
-                              boxShadow: [
+                              border: Border.all(color: AppColors.surface, width: 2),
+                              boxShadow: const [
                                 BoxShadow(
-                                  color: const Color(0xFFE28743).withValues(alpha: 0.25),
+                                  color: AppColors.shadowDark,
                                   blurRadius: 20,
-                                  offset: const Offset(0, 8),
+                                  offset: Offset(0, 8),
                                 ),
                               ],
                             ),
@@ -302,12 +303,12 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
                                 width: 44,
                                 height: 44,
                                 decoration: const BoxDecoration(
-                                  color: Color(0xFFFAECE0),
+                                  color: AppColors.goldTint,
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(
                                   Icons.lock_rounded,
-                                  color: Color(0xFFE28743),
+                                  color: AppColors.burgundy,
                                   size: 24,
                                 ),
                               ),
@@ -319,7 +320,7 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF2D1F17),
+                              color: AppColors.textPrimary,
                               letterSpacing: -0.3,
                             ),
                           ),
@@ -329,7 +330,7 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 12,
-                              color: Color(0xFF6E5A4F),
+                              color: AppColors.textSecondary,
                               height: 1.4,
                             ),
                           ),
@@ -346,17 +347,17 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
                                 height: 16,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: isFilled ? const Color(0xFFE28743) : Colors.white.withValues(alpha: 0.7),
+                                  color: isFilled ? AppColors.burgundy : AppColors.surface.withValues(alpha: 0.7),
                                   border: Border.all(
-                                    color: isFilled ? const Color(0xFFC86D2B) : const Color(0xFFD8C5B6),
+                                    color: isFilled ? AppColors.burgundyDark : AppColors.border,
                                     width: isFilled ? 1.5 : 2,
                                   ),
                                   boxShadow: isFilled
-                                      ? [
+                                      ? const [
                                           BoxShadow(
-                                            color: const Color(0xFFE28743).withValues(alpha: 0.35),
+                                            color: AppColors.shadowDark,
                                             blurRadius: 6,
-                                            offset: const Offset(0, 2),
+                                            offset: Offset(0, 2),
                                           ),
                                         ]
                                       : null,
@@ -372,19 +373,19 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFDF0E9),
+                                color: AppColors.errorBg,
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: const Color(0xFFF6C9BA)),
+                                border: Border.all(color: AppColors.errorBorder),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(Icons.timer_outlined, size: 16, color: Color(0xFFC84C32)),
+                                  const Icon(Icons.timer_outlined, size: 16, color: AppColors.error),
                                   const SizedBox(width: 8),
                                   Text(
                                     'Numpad terkunci. Coba lagi dalam $_lockCountdown detik',
                                     style: const TextStyle(
-                                      color: Color(0xFFC84C32),
+                                      color: AppColors.error,
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -396,20 +397,20 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFDF0E9),
+                                color: AppColors.errorBg,
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: const Color(0xFFF6C9BA)),
+                                border: Border.all(color: AppColors.errorBorder),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(Icons.warning_amber_rounded, size: 16, color: Color(0xFFC84C32)),
+                                  const Icon(Icons.warning_amber_rounded, size: 16, color: AppColors.error),
                                   const SizedBox(width: 8),
                                   Flexible(
                                     child: Text(
                                       _errorMessage!,
                                       style: const TextStyle(
-                                        color: Color(0xFFC84C32),
+                                        color: AppColors.error,
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -422,7 +423,7 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
                             const SizedBox(
                               height: 24,
                               width: 24,
-                              child: CircularProgressIndicator(strokeWidth: 2.5),
+                              child: CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.burgundy),
                             )
                           else
                             const SizedBox(height: 32),
@@ -482,14 +483,14 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.bold,
-                                                    color: Color(0xFF957F71),
+                                                    color: AppColors.textSecondary,
                                                   ),
                                                 ),
                                                 Text(
                                                   'Semua',
                                                   style: TextStyle(
                                                     fontSize: 9,
-                                                    color: Color(0xFFAFA197),
+                                                    color: AppColors.textMuted,
                                                   ),
                                                 ),
                                               ],
@@ -510,21 +511,21 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
                                           borderRadius: BorderRadius.circular(16),
                                           child: Container(
                                             decoration: BoxDecoration(
-                                              color: Colors.white,
+                                              color: AppColors.surface,
                                               borderRadius: BorderRadius.circular(16),
-                                              border: Border.all(color: const Color(0xFFEBDCD0)),
-                                              boxShadow: [
+                                              border: Border.all(color: AppColors.border),
+                                              boxShadow: const [
                                                 BoxShadow(
-                                                  color: const Color(0xFF542E15).withValues(alpha: 0.06),
+                                                  color: AppColors.shadow,
                                                   blurRadius: 6,
-                                                  offset: const Offset(0, 2),
+                                                  offset: Offset(0, 2),
                                                 ),
                                               ],
                                             ),
                                             child: const Center(
                                               child: Icon(
                                                 Icons.backspace_outlined,
-                                                color: Color(0xFFE28743),
+                                                color: AppColors.burgundy,
                                                 size: 22,
                                               ),
                                             ),
@@ -544,13 +545,13 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: const [
-                              Icon(Icons.lock_clock_outlined, size: 13, color: Color(0xFFA69488)),
+                              Icon(Icons.lock_clock_outlined, size: 13, color: AppColors.textMuted),
                               SizedBox(width: 4),
                               Text(
                                 'Terenkripsi secara lokal di perangkat POS Kedai Bandrek',
                                 style: TextStyle(
                                   fontSize: 10.5,
-                                  color: Color(0xFFA69488),
+                                  color: AppColors.textMuted,
                                 ),
                               ),
                             ],
@@ -577,7 +578,7 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
       child: SizedBox(
         height: 62,
         child: Material(
-          color: disabled ? Colors.grey.shade100 : Colors.white,
+          color: disabled ? AppColors.surfaceElevated : AppColors.surface,
           borderRadius: BorderRadius.circular(16),
           child: InkWell(
             onTap: disabled ? null : () => _onDigitPress(digit),
@@ -585,14 +586,14 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFEBDCD0)),
+                border: Border.all(color: AppColors.border),
                 boxShadow: disabled
                     ? null
-                    : [
+                    : const [
                         BoxShadow(
-                          color: const Color(0xFF542E15).withValues(alpha: 0.06),
+                          color: AppColors.shadow,
                           blurRadius: 6,
-                          offset: const Offset(0, 2),
+                          offset: Offset(0, 2),
                         ),
                       ],
               ),
@@ -604,7 +605,7 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: disabled ? Colors.grey : const Color(0xFF2D1F17),
+                      color: disabled ? AppColors.textMuted : AppColors.textPrimary,
                       height: 1.1,
                     ),
                   ),
@@ -615,7 +616,7 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
                         fontSize: 9.5,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.5,
-                        color: disabled ? Colors.grey : const Color(0xFF9A8578),
+                        color: disabled ? AppColors.textMuted : AppColors.textSecondary,
                       ),
                     )
                   else

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/app_colors.dart';
 import '../../../core/format.dart';
-import '../../../core/theme.dart';
 import '../../../data/models/transaksi_item.dart';
 import '../../../data/transaksi_repository.dart';
 import '../../../providers/admin_laporan_provider.dart';
@@ -161,7 +161,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Sesi admin telah berakhir. Silakan masuk kembali.'),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
             ),
           );
         }
@@ -173,7 +173,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(errStr.replaceAll('Exception:', '').trim()),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -192,7 +192,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
       builder: (context, scrollController) {
         return Container(
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -204,7 +204,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: AppColors.divider,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -216,7 +216,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
                   children: [
                     Text(
                       widget.editMode ? 'Edit Pesanan' : 'Pesanan',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                     ),
                     const Spacer(),
                     if (!widget.editMode && items.isNotEmpty)
@@ -224,7 +224,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
                         onPressed: () {
                           ref.read(cartProvider.notifier).clear();
                         },
-                        child: const Text('Kosongkan', style: TextStyle(color: Colors.red)),
+                        child: const Text('Kosongkan', style: TextStyle(color: AppColors.error)),
                       ),
                   ],
                 ),
@@ -234,7 +234,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
               // Daftar item
               Expanded(
                 child: items.isEmpty
-                    ? const Center(child: Text('Pesanan kosong', style: TextStyle(color: Colors.grey)))
+                    ? const Center(child: Text('Pesanan kosong', style: TextStyle(color: AppColors.textMuted)))
                     : ListView.separated(
                         controller: scrollController,
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -279,7 +279,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
                         const Text('Total', style: TextStyle(fontSize: 16)),
                         Text(
                           AppFormat.currency(_totalHarga),
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primary),
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.burgundy),
                         ),
                       ],
                     ),
@@ -289,7 +289,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
                       child: _isLoading
                           ? const SizedBox(
                               width: 20, height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.cream),
                             )
                           : Text(
                               widget.editMode ? 'Simpan Perubahan' : 'Simpan Transaksi',
@@ -309,15 +309,15 @@ class _CartSheetState extends ConsumerState<CartSheet> {
   Widget _buildItemRow(TransaksiItem item, int idx) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(color: AppTheme.neutral, borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(color: AppColors.surfaceElevated, borderRadius: BorderRadius.circular(12)),
       child: Row(
         children: [
           GestureDetector(
             onTap: () => _remove(idx, item),
             child: Container(
               width: 32, height: 32,
-              decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.1), shape: BoxShape.circle),
-              child: const Icon(Icons.close, size: 16, color: Colors.red),
+              decoration: const BoxDecoration(color: AppColors.errorBg, shape: BoxShape.circle),
+              child: const Icon(Icons.close, size: 16, color: AppColors.error),
             ),
           ),
           const SizedBox(width: 8),
@@ -325,8 +325,8 @@ class _CartSheetState extends ConsumerState<CartSheet> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.namaMenu, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                Text(AppFormat.currency(item.hargaSatuan), style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                Text(item.namaMenu, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: AppColors.textPrimary)),
+                Text(AppFormat.currency(item.hargaSatuan), style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
               ],
             ),
           ),
@@ -334,7 +334,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
             _qtyButton(Icons.remove, () => _decrement(idx, item)),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text('${item.qty}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              child: Text('${item.qty}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.textPrimary)),
             ),
             _qtyButton(Icons.add, () => _increment(idx, item)),
           ]),
@@ -348,8 +348,8 @@ class _CartSheetState extends ConsumerState<CartSheet> {
       onTap: onTap,
       child: Container(
         width: 32, height: 32,
-        decoration: BoxDecoration(color: AppTheme.tertiary, borderRadius: BorderRadius.circular(8)),
-        child: Icon(icon, size: 18, color: AppTheme.primary),
+        decoration: BoxDecoration(color: AppColors.goldTint, borderRadius: BorderRadius.circular(8)),
+        child: Icon(icon, size: 18, color: AppColors.burgundy),
       ),
     );
   }
@@ -361,13 +361,13 @@ class _CartSheetState extends ConsumerState<CartSheet> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primary : AppTheme.neutral,
+          color: isSelected ? AppColors.burgundy : AppColors.surfaceElevated,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black87,
+            color: isSelected ? AppColors.cream : AppColors.textPrimary,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),

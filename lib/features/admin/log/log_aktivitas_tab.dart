@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../../core/theme.dart';
+import '../../../core/app_colors.dart';
 import '../../../data/models/log_aktivitas_item.dart';
 import '../../../providers/admin_log_provider.dart';
 import '../../../providers/admin_provider.dart';
@@ -23,7 +23,7 @@ class LogAktivitasTab extends ConsumerWidget {
           const SnackBar(
             content:
                 Text('Sesi admin telah berakhir. Silakan masukkan PIN kembali.'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       });
@@ -47,7 +47,7 @@ class LogAktivitasTab extends ConsumerWidget {
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9EFE6),
+      backgroundColor: AppColors.scaffoldBg,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Column(
@@ -55,20 +55,27 @@ class LogAktivitasTab extends ConsumerWidget {
           children: const [
             Text(
               'Log Aktivitas',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: AppColors.cream,
+              ),
             ),
             Text(
               'Audit Trail & Keamanan Kasir',
-              style: TextStyle(fontSize: 12, color: AppTheme.outline),
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.cardBgSecondary,
+              ),
             ),
           ],
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.appBarBg,
         elevation: 0,
         actions: [
           IconButton(
             tooltip: 'Muat Ulang',
-            icon: const Icon(Icons.refresh, color: AppTheme.primary),
+            icon: const Icon(Icons.refresh, color: AppColors.gold),
             onPressed: () => ref.invalidate(adminLogAktivitasProvider),
           ),
         ],
@@ -82,7 +89,7 @@ class LogAktivitasTab extends ConsumerWidget {
             // Filter Chips Bar
             SliverToBoxAdapter(
               child: Container(
-                color: Colors.white,
+                color: AppColors.cardBg,
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -95,23 +102,23 @@ class LogAktivitasTab extends ConsumerWidget {
                           label: Text(f.label),
                           selected: isSelected,
                           showCheckmark: false,
-                          selectedColor: AppTheme.primary,
-                          backgroundColor: const Color(0xFFF9EFE6),
+                          selectedColor: AppColors.burgundy,
+                          backgroundColor: AppColors.cardBgSecondary,
                           labelStyle: TextStyle(
                             fontSize: 12,
                             fontWeight: isSelected
                                 ? FontWeight.w700
                                 : FontWeight.w500,
                             color: isSelected
-                                ? Colors.white
-                                : const Color(0xFF6E5A4F),
+                                ? AppColors.cream
+                                : AppColors.textDark,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                             side: BorderSide(
                               color: isSelected
-                                  ? AppTheme.primary
-                                  : Colors.transparent,
+                                  ? AppColors.burgundy
+                                  : AppColors.border,
                             ),
                           ),
                           onSelected: (_) {
@@ -134,24 +141,24 @@ class LogAktivitasTab extends ConsumerWidget {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFEE5D4).withValues(alpha: 0.6),
+                    color: AppColors.gold.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppTheme.secondary.withValues(alpha: 0.3),
+                      color: AppColors.gold.withValues(alpha: 0.4),
                     ),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: const [
                       Icon(Icons.shield_outlined,
-                          size: 20, color: AppTheme.primary),
+                          size: 20, color: AppColors.burgundy),
                       SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           'Catatan aktivitas ini tersimpan secara otomatis dan permanen (tamper-proof) untuk mengawasi kasir & mencegah manipulasi.',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Color(0xFF5D3A24),
+                            color: AppColors.textDark,
                             height: 1.35,
                           ),
                         ),
@@ -166,18 +173,18 @@ class LogAktivitasTab extends ConsumerWidget {
             logAsync.when(
               data: (logs) {
                 if (logs.isEmpty) {
-                  return SliverFillRemaining(
+                  return const SliverFillRemaining(
                     hasScrollBody: false,
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.verified_user_outlined,
-                              size: 48, color: Colors.grey.shade400),
-                          const SizedBox(height: 12),
-                          const Text(
+                              size: 48, color: AppColors.textMuted),
+                          SizedBox(height: 12),
+                          Text(
                             'Belum ada catatan aktivitas pada kategori ini.',
-                            style: TextStyle(color: Color(0xFF6E5A4F)),
+                            style: TextStyle(color: AppColors.textMuted),
                           ),
                         ],
                       ),
@@ -208,7 +215,7 @@ class LogAktivitasTab extends ConsumerWidget {
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF7C4A2D),
+                                color: AppColors.burgundy,
                                 letterSpacing: 0.3,
                               ),
                             ),
@@ -222,7 +229,9 @@ class LogAktivitasTab extends ConsumerWidget {
                 );
               },
               loading: () => const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(
+                  child: CircularProgressIndicator(color: AppColors.burgundy),
+                ),
               ),
               error: (err, _) => SliverFillRemaining(
                 hasScrollBody: false,
@@ -233,15 +242,19 @@ class LogAktivitasTab extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.error_outline,
-                            color: Colors.red, size: 44),
+                            color: AppColors.error, size: 44),
                         const SizedBox(height: 12),
                         Text(
                           'Gagal memuat log aktivitas:\n${err.toString().replaceAll('Exception:', '').trim()}',
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.red),
+                          style: const TextStyle(color: AppColors.error),
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.burgundy,
+                            foregroundColor: AppColors.cream,
+                          ),
                           onPressed: () =>
                               ref.invalidate(adminLogAktivitasProvider),
                           child: const Text('Coba Lagi'),
@@ -277,16 +290,16 @@ class LogAktivitasTab extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: style.borderColor.withValues(alpha: 0.35),
+          color: style.borderColor.withValues(alpha: 0.5),
         ),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: const Color(0xFF7C4A2D).withValues(alpha: 0.03),
+            color: AppColors.shadowColor,
             blurRadius: 6,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -323,8 +336,8 @@ class LogAktivitasTab extends ConsumerWidget {
                             ),
                             decoration: BoxDecoration(
                               color: log.aktor.toLowerCase() == 'admin'
-                                  ? const Color(0xFFEDE7F6)
-                                  : const Color(0xFFE0F2F1),
+                                  ? AppColors.burgundy.withValues(alpha: 0.12)
+                                  : AppColors.gold.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -333,8 +346,8 @@ class LogAktivitasTab extends ConsumerWidget {
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                                 color: log.aktor.toLowerCase() == 'admin'
-                                    ? const Color(0xFF512DA8)
-                                    : const Color(0xFF00796B),
+                                  ? AppColors.burgundy
+                                  : AppColors.textDark,
                               ),
                             ),
                           ),
@@ -363,7 +376,7 @@ class LogAktivitasTab extends ConsumerWidget {
                         DateFormat('HH:mm').format(log.createdAt.toLocal()),
                         style: const TextStyle(
                           fontSize: 11,
-                          color: AppTheme.outline,
+                          color: AppColors.textMuted,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -376,7 +389,7 @@ class LogAktivitasTab extends ConsumerWidget {
                     style: const TextStyle(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF1F1B16),
+                      color: AppColors.textDark,
                     ),
                   ),
                   if (log.rincian != null && log.rincian!.isNotEmpty) ...[
@@ -385,7 +398,7 @@ class LogAktivitasTab extends ConsumerWidget {
                       log.rincian!,
                       style: const TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF5D4A3E),
+                        color: AppColors.textMuted,
                         height: 1.3,
                       ),
                     ),
@@ -403,44 +416,44 @@ class LogAktivitasTab extends ConsumerWidget {
     if (tipe.contains('BATAL')) {
       return _LogStyle(
         icon: Icons.cancel_outlined,
-        accentColor: const Color(0xFFD32F2F),
-        bgColor: const Color(0xFFFFEBEE),
-        borderColor: const Color(0xFFEF9A9A),
+        accentColor: AppColors.error,
+        bgColor: AppColors.errorBg,
+        borderColor: AppColors.error.withValues(alpha: 0.3),
         badgeLabel: 'Pembatalan',
       );
     }
     if (tipe.contains('UBAH') || tipe.contains('EDIT')) {
       return _LogStyle(
         icon: Icons.edit_note_outlined,
-        accentColor: const Color(0xFFE65100),
-        bgColor: const Color(0xFFFFF3E0),
-        borderColor: const Color(0xFFFFCC80),
+        accentColor: AppColors.warning,
+        bgColor: AppColors.warningBg,
+        borderColor: AppColors.warning.withValues(alpha: 0.3),
         badgeLabel: 'Perubahan',
       );
     }
     if (tipe.contains('TRANSAKSI_BARU')) {
       return _LogStyle(
         icon: Icons.add_shopping_cart,
-        accentColor: const Color(0xFF2E7D32),
-        bgColor: const Color(0xFFE8F5E9),
-        borderColor: const Color(0xFFA5D6A7),
+        accentColor: AppColors.success,
+        bgColor: AppColors.successBg,
+        borderColor: AppColors.success.withValues(alpha: 0.3),
         badgeLabel: 'Transaksi Baru',
       );
     }
     if (tipe.contains('MENU') || tipe.contains('KATEGORI')) {
       return _LogStyle(
         icon: Icons.restaurant_menu,
-        accentColor: const Color(0xFF1565C0),
-        bgColor: const Color(0xFFE3F2FD),
-        borderColor: const Color(0xFF90CAF9),
+        accentColor: AppColors.info,
+        bgColor: AppColors.infoBg,
+        borderColor: AppColors.info.withValues(alpha: 0.3),
         badgeLabel: 'Menu & Sistem',
       );
     }
     return _LogStyle(
       icon: Icons.history,
-      accentColor: AppTheme.primary,
-      bgColor: const Color(0xFFF9EFE6),
-      borderColor: AppTheme.surfaceDim,
+      accentColor: AppColors.burgundy,
+      bgColor: AppColors.cardBgSecondary,
+      borderColor: AppColors.border,
       badgeLabel: 'Aktivitas',
     );
   }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/app_colors.dart';
 import '../../../core/format.dart';
-import '../../../core/theme.dart';
 import '../../../data/models/transaksi.dart';
 
 class _ProdukRow {
@@ -55,11 +55,11 @@ class ProdukTerjualCard extends StatelessWidget {
     final maxQty = rows.isNotEmpty ? rows.first.qty : 1;
 
     return Card(
-      color: Colors.white,
+      color: AppColors.surface,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: AppTheme.surfaceDim.withValues(alpha: 0.5)),
+        side: const BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -78,7 +78,7 @@ class ProdukTerjualCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF1F1B16),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     if (judulPeriode != null)
@@ -86,7 +86,7 @@ class ProdukTerjualCard extends StatelessWidget {
                         judulPeriode!,
                         style: const TextStyle(
                           fontSize: 11,
-                          color: AppTheme.outline,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                   ],
@@ -95,7 +95,7 @@ class ProdukTerjualCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFEE5D4),
+                    color: AppColors.gold,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -103,7 +103,7 @@ class ProdukTerjualCard extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.primary,
+                      color: AppColors.textOnGold,
                     ),
                   ),
                 ),
@@ -112,15 +112,15 @@ class ProdukTerjualCard extends StatelessWidget {
 
             if (rows.isEmpty) ...[
               const SizedBox(height: 20),
-              Center(
+              const Center(
                 child: Column(
                   children: [
                     Icon(Icons.restaurant_menu,
-                        size: 36, color: Colors.grey.shade300),
-                    const SizedBox(height: 8),
-                    const Text(
+                        size: 36, color: AppColors.textMuted),
+                    SizedBox(height: 8),
+                    Text(
                       'Belum ada produk terjual pada periode ini',
-                      style: TextStyle(fontSize: 12, color: AppTheme.outline),
+                      style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                     ),
                   ],
                 ),
@@ -143,7 +143,7 @@ class ProdukTerjualCard extends StatelessWidget {
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF1F1B16),
+                                color: AppColors.textPrimary,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -154,7 +154,7 @@ class ProdukTerjualCard extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: AppTheme.primary,
+                              color: AppColors.burgundy,
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -164,7 +164,7 @@ class ProdukTerjualCard extends StatelessWidget {
                               AppFormat.currency(row.total),
                               style: const TextStyle(
                                 fontSize: 12,
-                                color: Color(0xFF5D4A3E),
+                                color: AppColors.textSecondary,
                               ),
                               textAlign: TextAlign.right,
                             ),
@@ -177,9 +177,9 @@ class ProdukTerjualCard extends StatelessWidget {
                         child: LinearProgressIndicator(
                           value: row.qty / maxQty,
                           minHeight: 4,
-                          backgroundColor: const Color(0xFFF9EFE6),
+                          backgroundColor: AppColors.surfaceElevated,
                           valueColor: const AlwaysStoppedAnimation<Color>(
-                            AppTheme.secondary,
+                            AppColors.gold,
                           ),
                         ),
                       ),
@@ -198,7 +198,7 @@ class ProdukTerjualCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF1F1B16),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   Text(
@@ -206,7 +206,7 @@ class ProdukTerjualCard extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.primary,
+                      color: AppColors.burgundy,
                     ),
                   ),
                 ],

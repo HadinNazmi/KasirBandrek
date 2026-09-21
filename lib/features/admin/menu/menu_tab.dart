@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/app_colors.dart';
 import '../../../core/format.dart';
 import '../../../core/network_info.dart';
-import '../../../core/theme.dart';
 import '../../../data/models/admin_menu_item.dart';
 import '../../../providers/admin_provider.dart';
 import '../../../providers/kategori_provider.dart';
@@ -44,7 +44,7 @@ class _MenuTabState extends ConsumerState<MenuTab> {
     if (!hasInternet) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(NetworkInfo.offlineMessage), backgroundColor: Colors.red),
+          const SnackBar(content: Text(NetworkInfo.offlineMessage), backgroundColor: AppColors.error),
         );
       }
       return;
@@ -87,7 +87,7 @@ class _MenuTabState extends ConsumerState<MenuTab> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(errStr.replaceAll('Exception:', '').trim()),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -109,7 +109,7 @@ class _MenuTabState extends ConsumerState<MenuTab> {
     if (!mounted) return;
     if (!hasInternet) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(NetworkInfo.offlineMessage), backgroundColor: Colors.red),
+        const SnackBar(content: Text(NetworkInfo.offlineMessage), backgroundColor: AppColors.error),
       );
       return;
     }
@@ -118,7 +118,7 @@ class _MenuTabState extends ConsumerState<MenuTab> {
       context: context,
       builder: (dCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.cardBg,
         contentPadding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -127,10 +127,10 @@ class _MenuTabState extends ConsumerState<MenuTab> {
               width: 56,
               height: 56,
               decoration: const BoxDecoration(
-                color: Color(0xFFFEECEB),
+                color: AppColors.errorBg,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.delete_outline_rounded, color: Colors.red, size: 28),
+              child: const Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 28),
             ),
             const SizedBox(height: 16),
             const Text(
@@ -138,7 +138,7 @@ class _MenuTabState extends ConsumerState<MenuTab> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF2D1F17),
+                color: AppColors.textDark,
               ),
               textAlign: TextAlign.center,
             ),
@@ -147,7 +147,7 @@ class _MenuTabState extends ConsumerState<MenuTab> {
               'Apakah Anda yakin ingin menghapus "${item.nama}" secara permanen?',
               style: const TextStyle(
                 fontSize: 13.5,
-                color: Color(0xFF7A6B62),
+                color: AppColors.textMuted,
                 height: 1.4,
               ),
               textAlign: TextAlign.center,
@@ -159,8 +159,8 @@ class _MenuTabState extends ConsumerState<MenuTab> {
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(dCtx, false),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF5A463B),
-                      backgroundColor: const Color(0xFFF7EFE9),
+                      foregroundColor: AppColors.textDark,
+                      backgroundColor: AppColors.cardBgSecondary,
                       side: BorderSide.none,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -178,8 +178,8 @@ class _MenuTabState extends ConsumerState<MenuTab> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(dCtx, true),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.shade600,
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.error,
+                      foregroundColor: AppColors.cream,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -223,7 +223,7 @@ class _MenuTabState extends ConsumerState<MenuTab> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(errStr.replaceAll('Exception:', '').trim()),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -240,7 +240,7 @@ class _MenuTabState extends ConsumerState<MenuTab> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Sesi admin telah berakhir. Silakan masukkan PIN kembali.'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
     }
@@ -258,11 +258,18 @@ class _MenuTabState extends ConsumerState<MenuTab> {
     });
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9EFE6),
+      backgroundColor: AppColors.scaffoldBg,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Kelola Menu', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
+        title: const Text(
+          'Kelola Menu',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: AppColors.cream,
+          ),
+        ),
+        backgroundColor: AppColors.appBarBg,
         elevation: 0,
         actions: [
           Padding(
@@ -272,9 +279,10 @@ class _MenuTabState extends ConsumerState<MenuTab> {
               icon: const Icon(Icons.add, size: 18),
               label: const Text('Tambah'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.burgundy,
+                foregroundColor: AppColors.cream,
                 elevation: 0,
+                minimumSize: const Size(0, 36),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               ),
@@ -284,12 +292,13 @@ class _MenuTabState extends ConsumerState<MenuTab> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openForm(),
-        backgroundColor: AppTheme.primary,
-        foregroundColor: Colors.white,
+        backgroundColor: AppColors.burgundy,
+        foregroundColor: AppColors.cream,
         icon: const Icon(Icons.add_rounded),
         label: const Text('Tambah Menu Baru', style: TextStyle(fontWeight: FontWeight.bold)),
       ),
       body: RefreshIndicator(
+        color: AppColors.burgundy,
         onRefresh: () async {
           ref.invalidate(adminDaftarMenuProvider);
           ref.invalidate(kategoriProvider);
@@ -327,11 +336,11 @@ class _MenuTabState extends ConsumerState<MenuTab> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.restaurant_menu, size: 56, color: Color(0xFF84746C)),
+                    const Icon(Icons.restaurant_menu, size: 56, color: AppColors.textMuted),
                     const SizedBox(height: 12),
                     const Text(
                       'Belum ada menu terdaftar.',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D1F17)),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textDark),
                     ),
                     const SizedBox(height: 8),
                     ElevatedButton.icon(
@@ -339,8 +348,8 @@ class _MenuTabState extends ConsumerState<MenuTab> {
                       icon: const Icon(Icons.add),
                       label: const Text('Tambah Menu Sekarang'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primary,
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.burgundy,
+                        foregroundColor: AppColors.cream,
                       ),
                     ),
                   ],
@@ -369,7 +378,7 @@ class _MenuTabState extends ConsumerState<MenuTab> {
                             width: 8,
                             height: 8,
                             decoration: const BoxDecoration(
-                              color: AppTheme.secondary,
+                              color: AppColors.gold,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -379,24 +388,24 @@ class _MenuTabState extends ConsumerState<MenuTab> {
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF2D1F17),
+                              color: AppColors.textDark,
                             ),
                           ),
                           const SizedBox(width: 6),
                           Text(
                             '(${items.length})',
-                            style: const TextStyle(fontSize: 13, color: Color(0xFF84746C)),
+                            style: const TextStyle(fontSize: 13, color: AppColors.textMuted),
                           ),
                           const Spacer(),
                           TextButton.icon(
                             onPressed: () => _openForm(null, categoryId),
-                            icon: const Icon(Icons.add, size: 15, color: AppTheme.primary),
+                            icon: const Icon(Icons.add, size: 15, color: AppColors.burgundy),
                             label: Text(
                               '+ Tambah $categoryName',
-                              style: const TextStyle(color: AppTheme.primary, fontSize: 12, fontWeight: FontWeight.bold),
+                              style: const TextStyle(color: AppColors.burgundy, fontSize: 12, fontWeight: FontWeight.bold),
                             ),
                             style: TextButton.styleFrom(
-                              backgroundColor: const Color(0xFFFEE5D4),
+                              backgroundColor: AppColors.gold.withValues(alpha: 0.2),
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               minimumSize: const Size(0, 30),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -411,18 +420,18 @@ class _MenuTabState extends ConsumerState<MenuTab> {
                         margin: const EdgeInsets.symmetric(vertical: 6),
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.cardBg,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: const Color(0xFFEBDCD0)),
+                          border: Border.all(color: AppColors.border),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.info_outline, color: Color(0xFF84746C), size: 18),
+                            const Icon(Icons.info_outline, color: AppColors.textMuted, size: 18),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
                                 'Belum ada menu di kategori $categoryName',
-                                style: const TextStyle(color: Color(0xFF84746C), fontSize: 13),
+                                style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
                               ),
                             ),
                             OutlinedButton.icon(
@@ -430,8 +439,8 @@ class _MenuTabState extends ConsumerState<MenuTab> {
                               icon: const Icon(Icons.add, size: 14),
                               label: const Text('Tambah'),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: AppTheme.primary,
-                                side: const BorderSide(color: AppTheme.primary),
+                                foregroundColor: AppColors.burgundy,
+                                side: const BorderSide(color: AppColors.burgundy),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                 minimumSize: const Size(0, 30),
@@ -449,16 +458,25 @@ class _MenuTabState extends ConsumerState<MenuTab> {
               },
             );
           },
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const Center(
+            child: CircularProgressIndicator(color: AppColors.burgundy),
+          ),
           error: (err, _) => Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error_outline, color: Colors.red, size: 40),
+                const Icon(Icons.error_outline, color: AppColors.error, size: 40),
                 const SizedBox(height: 8),
-                Text(err.toString().replaceAll('Exception:', '').trim()),
+                Text(
+                  err.toString().replaceAll('Exception:', '').trim(),
+                  style: const TextStyle(color: AppColors.error),
+                ),
                 const SizedBox(height: 12),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.burgundy,
+                    foregroundColor: AppColors.cream,
+                  ),
                   onPressed: () => ref.invalidate(adminDaftarMenuProvider),
                   child: const Text('Coba Lagi'),
                 ),
@@ -477,16 +495,16 @@ class _MenuTabState extends ConsumerState<MenuTab> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: isNonaktif ? 0.8 : 1.0),
+        color: isNonaktif ? AppColors.cardBg.withValues(alpha: 0.8) : AppColors.cardBg,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isNonaktif ? const Color(0xFFD7C2B9).withValues(alpha: 0.5) : const Color(0xFFEBDCD0).withValues(alpha: 0.6),
+          color: isNonaktif ? AppColors.border.withValues(alpha: 0.5) : AppColors.border,
         ),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: const Color(0xFF7C4A2D).withValues(alpha: isNonaktif ? 0.02 : 0.06),
+            color: AppColors.shadowColor,
             blurRadius: 10,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -501,7 +519,7 @@ class _MenuTabState extends ConsumerState<MenuTab> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: isNonaktif ? Colors.grey.shade200 : const Color(0xFFFEE5D4),
+                  color: isNonaktif ? AppColors.disabledBg : AppColors.gold.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: (item.fotoUrl != null && item.fotoUrl!.isNotEmpty)
@@ -512,13 +530,13 @@ class _MenuTabState extends ConsumerState<MenuTab> {
                         fit: BoxFit.cover,
                         errorBuilder: (ctx, err, stack) => Icon(
                           Icons.local_cafe_rounded,
-                          color: isNonaktif ? Colors.grey : AppTheme.primary,
+                          color: isNonaktif ? AppColors.textDisabled : AppColors.burgundy,
                           size: 24,
                         ),
                       )
                     : Icon(
                         Icons.local_cafe_rounded,
-                        color: isNonaktif ? Colors.grey : AppTheme.primary,
+                        color: isNonaktif ? AppColors.textDisabled : AppColors.burgundy,
                         size: 24,
                       ),
               ),
@@ -538,7 +556,7 @@ class _MenuTabState extends ConsumerState<MenuTab> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
-                            color: isNonaktif ? Colors.grey.shade600 : const Color(0xFF2D1F17),
+                            color: isNonaktif ? AppColors.textDisabled : AppColors.textDark,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -549,12 +567,12 @@ class _MenuTabState extends ConsumerState<MenuTab> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFDAD6),
+                            color: AppColors.errorBg,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Text(
                             'Nonaktif',
-                            style: TextStyle(color: Color(0xFFBA1A1A), fontSize: 10, fontWeight: FontWeight.bold),
+                            style: TextStyle(color: AppColors.error, fontSize: 10, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
@@ -566,7 +584,7 @@ class _MenuTabState extends ConsumerState<MenuTab> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: isNonaktif ? Colors.grey : AppTheme.primary,
+                      color: isNonaktif ? AppColors.textDisabled : AppColors.burgundy,
                     ),
                   ),
                 ],
@@ -584,13 +602,16 @@ class _MenuTabState extends ConsumerState<MenuTab> {
                     height: 32,
                     child: Padding(
                       padding: EdgeInsets.all(6),
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.burgundy),
                     ),
                   )
                 else
                   Switch(
                     value: item.aktif,
-                    activeThumbColor: AppTheme.secondary,
+                    activeThumbColor: AppColors.gold,
+                    activeTrackColor: AppColors.burgundy,
+                    inactiveThumbColor: AppColors.textDisabled,
+                    inactiveTrackColor: AppColors.cardBgSecondary,
                     onChanged: (_) => _toggleStatus(item),
                   ),
                 const SizedBox(width: 4),
@@ -603,13 +624,13 @@ class _MenuTabState extends ConsumerState<MenuTab> {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF0E7DE),
+                      color: AppColors.cardBgSecondary,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(
                       Icons.edit_outlined,
                       size: 18,
-                      color: AppTheme.primary,
+                      color: AppColors.burgundy,
                     ),
                   ),
                 ),
@@ -623,13 +644,13 @@ class _MenuTabState extends ConsumerState<MenuTab> {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFEBE8),
+                      color: AppColors.errorBg,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(
                       Icons.delete_outline_rounded,
                       size: 18,
-                      color: Color(0xFFBA1A1A),
+                      color: AppColors.error,
                     ),
                   ),
                 ),

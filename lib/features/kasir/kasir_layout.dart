@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/theme.dart';
+import '../../core/app_colors.dart';
 import 'kasir_screen.dart';
 import 'hari_ini_tab.dart';
 
@@ -58,7 +58,7 @@ class _KasirLayoutState extends ConsumerState<KasirLayout> {
           color: Theme.of(context).scaffoldBackgroundColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: AppColors.shadowDark,
               blurRadius: 10,
               spreadRadius: 1,
             ),
@@ -76,8 +76,9 @@ class _KasirLayoutState extends ConsumerState<KasirLayout> {
                 _currentIndex = index;
               });
             },
-            selectedItemColor: AppTheme.primary,
-            unselectedItemColor: AppTheme.outline,
+            backgroundColor: AppColors.bottomNavBg,
+            selectedItemColor: AppColors.gold,
+            unselectedItemColor: AppColors.textOnDarkMuted,
             items: const [
               BottomNavigationBarItem(
                 icon: Icon(Icons.point_of_sale),
