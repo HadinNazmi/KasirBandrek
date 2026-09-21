@@ -14,6 +14,7 @@ import '../../../providers/supabase_provider.dart';
 /// maupun edit transaksi yang sudah ada (editMode = true).
 class CartSheet extends ConsumerStatefulWidget {
   final bool editMode;
+  final bool isLocalPending;
   final String? transaksiId;
   final List<TransaksiItem> initialItems;
   final String initialMetode;
@@ -22,6 +23,7 @@ class CartSheet extends ConsumerStatefulWidget {
   const CartSheet({
     super.key,
     this.editMode = false,
+    this.isLocalPending = false,
     this.transaksiId,
     this.initialItems = const [],
     this.initialMetode = 'tunai',
@@ -88,22 +90,31 @@ class _CartSheetState extends ConsumerState<CartSheet> {
 
     try {
       if (widget.editMode) {
-        final svc = ref.read(supabaseServiceProvider);
-        if (widget.adminToken != null) {
-          await svc.adminEditTransaksi(
-            token: widget.adminToken!,
+        if (widget.isLocalPending) {
+          final repo = ref.read(transaksiRepositoryProvider);
+          await repo.editPending(
             id: widget.transaksiId!,
             metode: _metodeBayar,
             items: _items,
           );
-          ref.invalidate(adminRiwayatProvider);
-          ref.invalidate(adminRingkasanProvider);
         } else {
-          await svc.kasirEditTransaksi(
-            id: widget.transaksiId!,
-            metode: _metodeBayar,
-            items: _items,
-          );
+          final svc = ref.read(supabaseServiceProvider);
+          if (widget.adminToken != null) {
+            await svc.adminEditTransaksi(
+              token: widget.adminToken!,
+              id: widget.transaksiId!,
+              metode: _metodeBayar,
+              items: _items,
+            );
+            ref.invalidate(adminRiwayatProvider);
+            ref.invalidate(adminRingkasanProvider);
+          } else {
+            await svc.kasirEditTransaksi(
+              id: widget.transaksiId!,
+              metode: _metodeBayar,
+              items: _items,
+            );
+          }
         }
         ref.invalidate(hariIniProvider);
         if (mounted) {

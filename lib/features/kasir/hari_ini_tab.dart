@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/format.dart';
 import '../../core/theme.dart';
 import '../../data/models/transaksi.dart';
+import '../../data/transaksi_repository.dart';
 import '../../providers/hari_ini_provider.dart';
+import '../../providers/sync_provider.dart';
 import '../../providers/supabase_provider.dart';
 import 'widgets/cart_sheet.dart';
 
@@ -144,8 +146,14 @@ class HariIniTab extends ConsumerWidget {
                     const SizedBox(width: 6),
                     if (isBatal)
                       _badge('Batal', Colors.red)
-                    else if (isDiedit)
-                      _badge('Diedit', Colors.orange),
+                    else ...[
+                      if (t.isPending) ...[
+                        _badge('Belum terkirim', Colors.orange),
+                        const SizedBox(width: 4),
+                      ],
+                      if (isDiedit)
+                        _badge('Diedit', Colors.blueGrey),
+                    ],
                   ]),
                   const SizedBox(height: 4),
                   // Ringkasan item
@@ -233,8 +241,16 @@ class HariIniTab extends ConsumerWidget {
                   Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(AppFormat.dateTime(t.createdAt.toLocal()),
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                    Text(t.metodeBayar.toUpperCase(),
-                        style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                    Row(
+                      children: [
+                        Text(t.metodeBayar.toUpperCase(),
+                            style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                        if (t.isPending) ...[
+                          const SizedBox(width: 8),
+                          _badge('Belum terkirim', Colors.orange),
+                        ],
+                      ],
+                    ),
                   ]),
                   const Spacer(),
                   Text(AppFormat.currency(t.total),
@@ -270,6 +286,19 @@ class HariIniTab extends ConsumerWidget {
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () {
+                          if (!t.isPending) {
+                            final isOnline = ref.read(isOnlineProvider).value ?? true;
+                            if (!isOnline) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Butuh internet untuk mengubah transaksi yang sudah terkirim'),
+                                  backgroundColor: Colors.orange,
+                                ),
+                              );
+                              return;
+                            }
+                          }
+
                           Navigator.pop(ctx);
                           showModalBottomSheet(
                             context: context,
@@ -277,6 +306,7 @@ class HariIniTab extends ConsumerWidget {
                             backgroundColor: Colors.transparent,
                             builder: (_) => CartSheet(
                               editMode: true,
+                              isLocalPending: t.isPending,
                               transaksiId: t.id,
                               initialItems: t.items,
                               initialMetode: t.metodeBayar,
@@ -333,6 +363,19 @@ class HariIniTab extends ConsumerWidget {
   }
 
   void _batalkan(BuildContext sheetCtx, BuildContext rootCtx, WidgetRef ref, Transaksi t) async {
+    if (!t.isPending) {
+      final isOnline = ref.read(isOnlineProvider).value ?? true;
+      if (!isOnline) {
+        ScaffoldMessenger.of(rootCtx).showSnackBar(
+          const SnackBar(
+            content: Text('Butuh internet untuk mengubah transaksi yang sudah terkirim'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+    }
+
     final confirm = await showDialog<bool>(
       context: sheetCtx,
       builder: (dCtx) => AlertDialog(
@@ -351,8 +394,13 @@ class HariIniTab extends ConsumerWidget {
 
     if (confirm != true) return;
     try {
-      final svc = ref.read(supabaseServiceProvider);
-      await svc.kasirBatalkanTransaksi(id: t.id);
+      if (t.isPending) {
+        final repo = ref.read(transaksiRepositoryProvider);
+        await repo.batalPending(t.id);
+      } else {
+        final svc = ref.read(supabaseServiceProvider);
+        await svc.kasirBatalkanTransaksi(id: t.id);
+      }
       ref.invalidate(hariIniProvider);
       if (sheetCtx.mounted) Navigator.pop(sheetCtx);
       if (rootCtx.mounted) {

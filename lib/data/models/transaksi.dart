@@ -9,6 +9,7 @@ class Transaksi {
   final DateTime? dibatalkanAt;
   final DateTime? dieditAt;
   final List<TransaksiItem> items;
+  final bool isPending;
 
   Transaksi({
     required this.id,
@@ -19,9 +20,10 @@ class Transaksi {
     this.dibatalkanAt,
     this.dieditAt,
     required this.items,
+    this.isPending = false,
   });
 
-  factory Transaksi.fromJson(Map<String, dynamic> json) {
+  factory Transaksi.fromJson(Map<String, dynamic> json, {bool isPending = false}) {
     return Transaksi(
       id: json['id'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
@@ -34,6 +36,31 @@ class Transaksi {
               ?.map((e) => TransaksiItem.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
+      isPending: isPending,
+    );
+  }
+
+  Transaksi copyWith({
+    String? id,
+    DateTime? createdAt,
+    int? total,
+    String? metodeBayar,
+    String? status,
+    DateTime? dibatalkanAt,
+    DateTime? dieditAt,
+    List<TransaksiItem>? items,
+    bool? isPending,
+  }) {
+    return Transaksi(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      total: total ?? this.total,
+      metodeBayar: metodeBayar ?? this.metodeBayar,
+      status: status ?? this.status,
+      dibatalkanAt: dibatalkanAt ?? this.dibatalkanAt,
+      dieditAt: dieditAt ?? this.dieditAt,
+      items: items ?? this.items,
+      isPending: isPending ?? this.isPending,
     );
   }
 

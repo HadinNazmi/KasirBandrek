@@ -4,10 +4,12 @@ import '../../core/format.dart';
 import '../../core/theme.dart';
 import '../../data/models/menu.dart';
 import '../../data/models/transaksi.dart';
+import '../../data/transaksi_repository.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/kategori_provider.dart';
 import '../../providers/menu_provider.dart';
 import '../../providers/supabase_provider.dart';
+import '../../providers/sync_provider.dart';
 import '../../providers/hari_ini_provider.dart';
 import '../admin/pin_gate.dart';
 import 'widgets/cart_sheet.dart';
@@ -55,8 +57,24 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
   Future<void> _batalkanLast() async {
     if (_lastSavedTransaksi == null) return;
     try {
-      final svc = ref.read(supabaseServiceProvider);
-      await svc.kasirBatalkanTransaksi(id: _lastSavedTransaksi!.id);
+      if (_lastSavedTransaksi!.isPending) {
+        await ref.read(transaksiRepositoryProvider).batalPending(_lastSavedTransaksi!.id);
+      } else {
+        final isOnline = ref.read(isOnlineProvider).value ?? true;
+        if (!isOnline) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Butuh internet untuk mengubah transaksi yang sudah terkirim'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
+          return;
+        }
+        final svc = ref.read(supabaseServiceProvider);
+        await svc.kasirBatalkanTransaksi(id: _lastSavedTransaksi!.id);
+      }
       ref.invalidate(hariIniProvider);
       if (mounted) {
         setState(() => _showNotif = false);
@@ -83,6 +101,7 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
       backgroundColor: Colors.transparent,
       builder: (_) => CartSheet(
         editMode: true,
+        isLocalPending: t.isPending,
         transaksiId: t.id,
         initialItems: t.items,
         initialMetode: t.metodeBayar,
@@ -95,6 +114,9 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
     final kategoriAsync = ref.watch(kategoriProvider);
     final menuAsync = ref.watch(menuProvider);
     final cart = ref.watch(cartProvider);
+    final isOnline = ref.watch(isOnlineProvider).value ?? true;
+    final pendingCount = ref.watch(pendingCountProvider);
+
     final totalItem = cart.fold(0, (sum, item) => sum + item.qty);
     final totalHarga = cart.fold(0, (sum, item) => sum + item.subtotal);
 
@@ -112,19 +134,66 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
               );
             },
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 4, right: 16),
-            child: Row(
-              children: [
-                Container(
-                  width: 8, height: 8,
-                  decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle),
+          // Indikator Online/Offline & Belum Terkirim (Tap untuk sync)
+          InkWell(
+            onTap: () {
+              ref.read(syncServiceProvider).sync();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    isOnline
+                        ? (pendingCount > 0 ? 'Menyinkronkan $pendingCount transaksi...' : 'Koneksi online dan data tersinkron')
+                        : 'Mode offline. Antrean akan dikirim saat online.',
+                  ),
+                  duration: const Duration(seconds: 2),
                 ),
-                const SizedBox(width: 6),
-                const Text('Online', style: TextStyle(fontSize: 12)),
-              ],
+              );
+            },
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              child: Row(
+                children: [
+                  Container(
+                    width: 9,
+                    height: 9,
+                    decoration: BoxDecoration(
+                      color: isOnline ? Colors.green : Colors.orange,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    isOnline ? 'Online' : 'Offline',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: isOnline ? Colors.black87 : Colors.orange.shade800,
+                    ),
+                  ),
+                  if (pendingCount > 0) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '$pendingCount belum terkirim',
+                        style: const TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFC84C32),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
           ),
+          const SizedBox(width: 6),
         ],
       ),
       body: Stack(
