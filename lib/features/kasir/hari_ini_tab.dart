@@ -24,11 +24,14 @@ class HariIniTab extends ConsumerWidget {
       body: hariIniAsync.when(
         data: (transaksis) {
           final selesai = transaksis.where((t) => t.status == 'selesai').toList();
-          final totalHariIni = selesai.fold(0, (sum, t) => sum + t.total);
-          final tunaiList = selesai.where((t) => t.metodeBayar.toLowerCase() == 'tunai').toList();
-          final qrisList = selesai.where((t) => t.metodeBayar.toLowerCase() == 'qris').toList();
+          final lunasList = selesai.where((t) => t.statusBayar == 'lunas').toList();
+          final belumBayarList = selesai.where((t) => t.statusBayar == 'belum').toList();
+          final totalHariIni = lunasList.fold(0, (sum, t) => sum + t.total);
+          final tunaiList = lunasList.where((t) => t.metodeBayar.toLowerCase() == 'tunai').toList();
+          final qrisList = lunasList.where((t) => t.metodeBayar.toLowerCase() == 'qris').toList();
           final totalTunai = tunaiList.fold(0, (sum, t) => sum + t.total);
           final totalQris = qrisList.fold(0, (sum, t) => sum + t.total);
+          final totalBelumBayar = belumBayarList.fold(0, (sum, t) => sum + t.total);
 
           return RefreshIndicator(
             onRefresh: () async => ref.invalidate(hariIniProvider),
@@ -201,6 +204,58 @@ class HariIniTab extends ConsumerWidget {
                                   ),
                                 ),
                               ),
+                              const SizedBox(width: 12),
+                              // Belum Bayar
+                              Expanded(
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surfaceElevated,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: AppColors.errorBorder),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: const [
+                                          Icon(
+                                            Icons.pending_actions,
+                                            size: 16,
+                                            color: AppColors.warning,
+                                          ),
+                                          SizedBox(width: 6),
+                                          Text(
+                                            'BELUM',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.warning,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        AppFormat.currency(totalBelumBayar),
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        '${belumBayarList.length} pesanan',
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: AppColors.textMuted,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -297,11 +352,22 @@ class HariIniTab extends ConsumerWidget {
                         _badge('Belum terkirim', AppColors.warning),
                         const SizedBox(width: 4),
                       ],
+                      if (t.statusBayar == 'belum') ...[
+                        _badge('Belum Bayar', AppColors.warning),
+                        const SizedBox(width: 4),
+                      ],
                       if (isDiedit)
                         _badge('Diedit', AppColors.info),
                     ],
                   ]),
                   const SizedBox(height: 4),
+                  if (t.namaPelanggan != null && t.namaPelanggan!.isNotEmpty) ...[
+                    Text(
+                      'Pemesan: ${t.namaPelanggan}',
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.burgundy),
+                    ),
+                    const SizedBox(height: 2),
+                  ],
                   // Ringkasan item
                   Text(
                     t.items.map((i) => '${i.namaMenu} ×${i.qty}').join(', '),
@@ -331,8 +397,12 @@ class HariIniTab extends ConsumerWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  t.metodeBayar.toUpperCase(),
-                  style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                  t.statusBayar == 'belum' ? 'BELUM BAYAR' : 'LUNAS (${t.metodeBayar.toUpperCase()})',
+                  style: TextStyle(
+                    fontSize: 11, 
+                    fontWeight: t.statusBayar == 'belum' ? FontWeight.bold : FontWeight.normal,
+                    color: t.statusBayar == 'belum' ? AppColors.warning : AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -384,21 +454,31 @@ class HariIniTab extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(children: [
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(AppFormat.dateTime(t.createdAt.toLocal()),
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.textPrimary)),
-                    Row(
-                      children: [
-                        Text(t.metodeBayar.toUpperCase(),
-                            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-                        if (t.isPending) ...[
-                          const SizedBox(width: 8),
-                          _badge('Belum terkirim', AppColors.warning),
-                        ],
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(AppFormat.dateTime(t.createdAt.toLocal()),
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.textPrimary)),
+                      const SizedBox(height: 4),
+                      if (t.namaPelanggan != null && t.namaPelanggan!.isNotEmpty) ...[
+                        Text('Pemesan: ${t.namaPelanggan}', style: const TextStyle(fontSize: 13, color: AppColors.burgundy, fontWeight: FontWeight.w500)),
+                        const SizedBox(height: 4),
                       ],
-                    ),
-                  ]),
-                  const Spacer(),
+                      Row(
+                        children: [
+                          Text(t.statusBayar == 'belum' ? 'BELUM BAYAR' : t.metodeBayar.toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 12, 
+                                color: t.statusBayar == 'belum' ? AppColors.warning : AppColors.textSecondary,
+                                fontWeight: t.statusBayar == 'belum' ? FontWeight.bold : FontWeight.normal,
+                              )),
+                          if (t.isPending) ...[
+                            const SizedBox(width: 8),
+                            _badge('Belum terkirim', AppColors.warning),
+                          ],
+                        ],
+                      ),
+                    ]),
+                  ),
                   Text(AppFormat.currency(t.total),
                       style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppColors.burgundy)),
                   const SizedBox(width: 12),
@@ -469,6 +549,8 @@ class HariIniTab extends ConsumerWidget {
                               isLocalPending: t.isPending,
                               transaksiId: t.id,
                               initialItems: t.items,
+                              initialNama: t.namaPelanggan,
+                              initialStatusBayar: t.statusBayar,
                               initialMetode: t.metodeBayar,
                             ),
                           );
@@ -483,6 +565,51 @@ class HariIniTab extends ConsumerWidget {
                         ),
                       ),
                     ),
+                    if (t.statusBayar == 'belum') ...[
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            if (!t.isPending) {
+                              final isOnline = ref.read(isOnlineProvider).value ?? true;
+                              if (!isOnline) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Butuh internet untuk mengubah transaksi yang sudah terkirim'),
+                                    backgroundColor: AppColors.warning,
+                                  ),
+                                );
+                                return;
+                              }
+                            }
+                            
+                            Navigator.pop(ctx);
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (_) => CartSheet(
+                                editMode: true,
+                                isLocalPending: t.isPending,
+                                transaksiId: t.id,
+                                initialItems: t.items,
+                                initialNama: t.namaPelanggan,
+                                initialStatusBayar: 'lunas',
+                                initialMetode: 'tunai',
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.payments_outlined),
+                          label: const Text('Bayar'),
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(0, 48),
+                            backgroundColor: AppColors.burgundy,
+                            foregroundColor: AppColors.cream,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        ),
+                      ),
+                    ],
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton.icon(

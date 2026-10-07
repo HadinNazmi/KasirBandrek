@@ -19,12 +19,18 @@ class SupabaseService {
   Future<Map<String, dynamic>> simpanTransaksi({
     required String id,
     required DateTime createdAt,
+    String? namaPelanggan,
+    String statusBayar = 'lunas',
+    String? catatan,
     required String metode,
     required List<TransaksiItem> items,
   }) async {
     final response = await _client.rpc('simpan_transaksi', params: {
       'p_id': id,
       'p_created_at': createdAt.toIso8601String(),
+      'p_nama_pelanggan': namaPelanggan,
+      'p_status_bayar': statusBayar,
+      'p_catatan': catatan,
       'p_metode': metode,
       'p_items': items.map((e) => e.toJson()).toList(),
     });
@@ -39,11 +45,17 @@ class SupabaseService {
 
   Future<Map<String, dynamic>> kasirEditTransaksi({
     required String id,
+    String? namaPelanggan,
+    String statusBayar = 'lunas',
+    String? catatan,
     required String metode,
     required List<TransaksiItem> items,
   }) async {
     final response = await _client.rpc('kasir_edit_transaksi', params: {
       'p_id': id,
+      'p_nama_pelanggan': namaPelanggan,
+      'p_status_bayar': statusBayar,
+      'p_catatan': catatan,
       'p_metode': metode,
       'p_items': items.map((e) => e.toJson()).toList(),
     });
@@ -106,12 +118,18 @@ class SupabaseService {
   Future<Map<String, dynamic>> adminEditTransaksi({
     required String token,
     required String id,
+    String? namaPelanggan,
+    String statusBayar = 'lunas',
+    String? catatan,
     required String metode,
     required List<TransaksiItem> items,
   }) async {
     final response = await _client.rpc('admin_edit_transaksi', params: {
       'p_token': token,
       'p_id': id,
+      'p_nama_pelanggan': namaPelanggan,
+      'p_status_bayar': statusBayar,
+      'p_catatan': catatan,
       'p_metode': metode,
       'p_items': items.map((e) => e.toJson()).toList(),
     });

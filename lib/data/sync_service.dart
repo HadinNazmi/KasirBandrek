@@ -58,6 +58,9 @@ class SyncService {
           final res = await _supabaseService.simpanTransaksi(
             id: t.id,
             createdAt: t.createdAt,
+            namaPelanggan: t.namaPelanggan,
+            statusBayar: t.statusBayar,
+            catatan: t.catatan,
             metode: t.metodeBayar,
             items: t.items,
           );

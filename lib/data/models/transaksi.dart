@@ -4,6 +4,9 @@ class Transaksi {
   final String id;
   final DateTime createdAt;
   final int total;
+  final String? namaPelanggan;
+  final String statusBayar;
+  final String? catatan;
   final String metodeBayar;
   final String status;
   final DateTime? dibatalkanAt;
@@ -15,6 +18,9 @@ class Transaksi {
     required this.id,
     required this.createdAt,
     required this.total,
+    this.namaPelanggan,
+    this.statusBayar = 'lunas',
+    this.catatan,
     required this.metodeBayar,
     required this.status,
     this.dibatalkanAt,
@@ -28,6 +34,9 @@ class Transaksi {
       id: json['id'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
       total: (json['total'] as num).toInt(),
+      namaPelanggan: json['nama_pelanggan'] as String?,
+      statusBayar: json['status_bayar'] as String? ?? 'lunas',
+      catatan: json['catatan'] as String?,
       metodeBayar: json['metode_bayar'] as String,
       status: json['status'] as String,
       dibatalkanAt: json['dibatalkan_at'] != null ? DateTime.parse(json['dibatalkan_at'] as String) : null,
@@ -44,6 +53,9 @@ class Transaksi {
     String? id,
     DateTime? createdAt,
     int? total,
+    String? namaPelanggan,
+    String? statusBayar,
+    String? catatan,
     String? metodeBayar,
     String? status,
     DateTime? dibatalkanAt,
@@ -55,6 +67,9 @@ class Transaksi {
       id: id ?? this.id,
       createdAt: createdAt ?? this.createdAt,
       total: total ?? this.total,
+      namaPelanggan: namaPelanggan ?? this.namaPelanggan,
+      statusBayar: statusBayar ?? this.statusBayar,
+      catatan: catatan ?? this.catatan,
       metodeBayar: metodeBayar ?? this.metodeBayar,
       status: status ?? this.status,
       dibatalkanAt: dibatalkanAt ?? this.dibatalkanAt,
@@ -69,6 +84,9 @@ class Transaksi {
       'id': id,
       'created_at': createdAt.toIso8601String(),
       'total': total,
+      if (namaPelanggan != null) 'nama_pelanggan': namaPelanggan,
+      'status_bayar': statusBayar,
+      if (catatan != null) 'catatan': catatan,
       'metode_bayar': metodeBayar,
       'status': status,
       if (dibatalkanAt != null) 'dibatalkan_at': dibatalkanAt!.toIso8601String(),

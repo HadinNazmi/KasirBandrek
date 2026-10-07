@@ -105,6 +105,8 @@ class _KasirScreenState extends ConsumerState<KasirScreen> {
         isLocalPending: t.isPending,
         transaksiId: t.id,
         initialItems: t.items,
+        initialNama: t.namaPelanggan,
+        initialCatatan: t.catatan,
         initialMetode: t.metodeBayar,
       ),
     );

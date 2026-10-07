@@ -21,6 +21,7 @@ class AdminRingkasan {
   final int jumlahBatal;
   final MetodeRingkasan tunai;
   final MetodeRingkasan qris;
+  final MetodeRingkasan belumBayar;
 
   AdminRingkasan({
     required this.totalPenjualan,
@@ -28,6 +29,7 @@ class AdminRingkasan {
     required this.jumlahBatal,
     required this.tunai,
     required this.qris,
+    required this.belumBayar,
   });
 
   factory AdminRingkasan.fromJson(Map<String, dynamic> json) {
@@ -37,6 +39,7 @@ class AdminRingkasan {
       jumlahBatal: (json['jumlah_batal'] as num?)?.toInt() ?? 0,
       tunai: MetodeRingkasan.fromJson(json['tunai'] as Map<String, dynamic>? ?? {}),
       qris: MetodeRingkasan.fromJson(json['qris'] as Map<String, dynamic>? ?? {}),
+      belumBayar: MetodeRingkasan.fromJson(json['belum_bayar'] as Map<String, dynamic>? ?? {}),
     );
   }
 }

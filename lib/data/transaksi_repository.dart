@@ -22,6 +22,9 @@ class TransaksiRepository {
   /// Tulis ke box antrean_transaksi di Hive dulu (status pending),
   /// lalu jalankan sinkronisasi di background.
   Future<Map<String, dynamic>> simpan({
+    String? namaPelanggan,
+    String statusBayar = 'lunas',
+    String? catatan,
     required String metode,
     required List<TransaksiItem> items,
   }) async {
@@ -33,6 +36,9 @@ class TransaksiRepository {
       id: id,
       createdAt: createdAt,
       total: total,
+      namaPelanggan: namaPelanggan,
+      statusBayar: statusBayar,
+      catatan: catatan,
       metodeBayar: metode,
       status: 'selesai',
       items: items,
@@ -56,6 +62,9 @@ class TransaksiRepository {
   /// Edit transaksi pending yang ada di antrean lokal
   Future<void> editPending({
     required String id,
+    String? namaPelanggan,
+    String statusBayar = 'lunas',
+    String? catatan,
     required String metode,
     required List<TransaksiItem> items,
   }) async {
@@ -66,6 +75,9 @@ class TransaksiRepository {
       final updated = Transaksi.fromJson(map, isPending: true).copyWith(
         items: items,
         total: total,
+        namaPelanggan: namaPelanggan,
+        statusBayar: statusBayar,
+        catatan: catatan,
         metodeBayar: metode,
         dieditAt: DateTime.now(),
       );

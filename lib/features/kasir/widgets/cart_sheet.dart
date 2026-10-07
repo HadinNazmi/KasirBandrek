@@ -19,6 +19,9 @@ class CartSheet extends ConsumerStatefulWidget {
   final bool isLocalPending;
   final String? transaksiId;
   final List<TransaksiItem> initialItems;
+  final String? initialNama;
+  final String? initialCatatan;
+  final String initialStatusBayar;
   final String initialMetode;
   final String? adminToken;
 
@@ -28,6 +31,9 @@ class CartSheet extends ConsumerStatefulWidget {
     this.isLocalPending = false,
     this.transaksiId,
     this.initialItems = const [],
+    this.initialNama,
+    this.initialCatatan,
+    this.initialStatusBayar = 'lunas',
     this.initialMetode = 'tunai',
     this.adminToken,
   });
@@ -38,6 +44,9 @@ class CartSheet extends ConsumerStatefulWidget {
 
 class _CartSheetState extends ConsumerState<CartSheet> {
   late List<TransaksiItem> _items;
+  late TextEditingController _namaController;
+  late TextEditingController _catatanController;
+  late String _statusBayar;
   late String _metodeBayar;
   bool _isLoading = false;
 
@@ -45,7 +54,17 @@ class _CartSheetState extends ConsumerState<CartSheet> {
   void initState() {
     super.initState();
     _items = widget.editMode ? List.from(widget.initialItems) : [];
+    _namaController = TextEditingController(text: widget.initialNama);
+    _catatanController = TextEditingController(text: widget.initialCatatan);
+    _statusBayar = widget.initialStatusBayar;
     _metodeBayar = widget.initialMetode;
+  }
+
+  @override
+  void dispose() {
+    _namaController.dispose();
+    _catatanController.dispose();
+    super.dispose();
   }
 
   List<TransaksiItem> get _currentItems =>
@@ -104,12 +123,21 @@ class _CartSheetState extends ConsumerState<CartSheet> {
     if (itemsToSave.isEmpty) return;
     setState(() => _isLoading = true);
 
+    final nama = _namaController.text.trim();
+    final namaPelanggan = nama.isNotEmpty ? nama : null;
+    
+    final catatan = _catatanController.text.trim();
+    final catatanForSave = catatan.isNotEmpty ? catatan : null;
+
     try {
       if (widget.editMode) {
         if (widget.isLocalPending) {
           final repo = ref.read(transaksiRepositoryProvider);
           await repo.editPending(
             id: widget.transaksiId!,
+            namaPelanggan: namaPelanggan,
+            statusBayar: _statusBayar,
+            catatan: catatanForSave,
             metode: _metodeBayar,
             items: itemsToSave,
           );
@@ -119,6 +147,9 @@ class _CartSheetState extends ConsumerState<CartSheet> {
             await svc.adminEditTransaksi(
               token: widget.adminToken!,
               id: widget.transaksiId!,
+              namaPelanggan: namaPelanggan,
+              statusBayar: _statusBayar,
+              catatan: catatanForSave,
               metode: _metodeBayar,
               items: itemsToSave,
             );
@@ -127,6 +158,9 @@ class _CartSheetState extends ConsumerState<CartSheet> {
           } else {
             await svc.kasirEditTransaksi(
               id: widget.transaksiId!,
+              namaPelanggan: namaPelanggan,
+              statusBayar: _statusBayar,
+              catatan: catatanForSave,
               metode: _metodeBayar,
               items: itemsToSave,
             );
@@ -143,7 +177,13 @@ class _CartSheetState extends ConsumerState<CartSheet> {
         }
       } else {
         final repo = ref.read(transaksiRepositoryProvider);
-        await repo.simpan(metode: _metodeBayar, items: itemsToSave);
+        await repo.simpan(
+          namaPelanggan: namaPelanggan,
+          statusBayar: _statusBayar,
+          catatan: catatanForSave,
+          metode: _metodeBayar,
+          items: itemsToSave,
+        );
         ref.read(cartProvider.notifier).clear();
         ref.invalidate(hariIniProvider);
         ref.invalidate(adminLaporanProvider);
@@ -244,20 +284,65 @@ class _CartSheetState extends ConsumerState<CartSheet> {
                       ),
               ),
 
-              // Metode bayar
+              // Detail Pemesan
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Divider(),
-                    const Text('Metode Bayar', style: TextStyle(fontWeight: FontWeight.w600)),
+                    const Text('Nama Pelanggan (Opsional)', style: TextStyle(fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _namaController,
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: AppColors.burgundy),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('Catatan Pesanan (Opsional)', style: TextStyle(fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _catatanController,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        hintText: 'Catatan pesanan',
+                        hintStyle: const TextStyle(
+                          color: AppColors.textMuted,
+                          fontSize: 13,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: AppColors.burgundy),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('Status Pembayaran', style: TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
                     Row(children: [
-                      _buildMetodeChip('Tunai', 'tunai'),
+                      _buildStatusChip('Belum Bayar (Catat)', 'belum'),
                       const SizedBox(width: 8),
-                      _buildMetodeChip('QRIS', 'qris'),
+                      _buildStatusChip('Sudah Bayar', 'lunas'),
                     ]),
+                    if (_statusBayar == 'lunas') ...[
+                      const SizedBox(height: 16),
+                      const Text('Metode Bayar', style: TextStyle(fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 8),
+                      Row(children: [
+                        _buildMetodeChip('Tunai', 'tunai'),
+                        const SizedBox(width: 8),
+                        _buildMetodeChip('QRIS', 'qris'),
+                      ]),
+                    ],
                   ],
                 ),
               ),
@@ -358,6 +443,27 @@ class _CartSheetState extends ConsumerState<CartSheet> {
     final isSelected = _metodeBayar == value;
     return GestureDetector(
       onTap: () => setState(() => _metodeBayar = value),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.burgundy : AppColors.surfaceElevated,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? AppColors.cream : AppColors.textPrimary,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusChip(String label, String value) {
+    final isSelected = _statusBayar == value;
+    return GestureDetector(
+      onTap: () => setState(() => _statusBayar = value),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
