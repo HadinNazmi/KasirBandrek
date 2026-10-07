@@ -67,11 +67,6 @@ class _CartSheetState extends ConsumerState<CartSheet> {
     super.dispose();
   }
 
-  List<TransaksiItem> get _currentItems =>
-      widget.editMode ? _items : ref.watch(cartProvider);
-
-  int get _totalHarga => _currentItems.fold(0, (s, i) => s + i.subtotal);
-
   void _increment(int idx, TransaksiItem item) {
     if (widget.editMode) {
       setState(() {
@@ -222,14 +217,22 @@ class _CartSheetState extends ConsumerState<CartSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final items = _currentItems;
-
     return DraggableScrollableSheet(
       initialChildSize: 0.75,
       minChildSize: 0.5,
       maxChildSize: 0.95,
       expand: false,
       builder: (context, scrollController) {
+        // PENTING: Watch di dalam builder bukan di outside
+        final items = widget.editMode ? _items : ref.watch(cartProvider);
+        final totalHarga = items.fold(0, (s, i) => s + i.subtotal);
+        
+        // DEBUG
+        print('CartSheet build - editMode: ${widget.editMode}, items.length: ${items.length}');
+        for (var i in items) {
+          print('  - ${i.namaMenu} x${i.qty}');
+        }
+
         return Container(
           decoration: const BoxDecoration(
             color: AppColors.surface,
@@ -271,117 +274,118 @@ class _CartSheetState extends ConsumerState<CartSheet> {
               ),
               const Divider(height: 1),
 
-              // Daftar item
+              // Daftar item - UTAMA (tidak scrollable, full height tersedia)
+              if (items.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32),
+                  child: Center(child: Text('Pesanan kosong', style: TextStyle(color: AppColors.textMuted))),
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: items.length,
+                    itemBuilder: (_, idx) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: _buildItemRow(items[idx], idx),
+                      );
+                    },
+                  ),
+                ),
+
+              // Detail Pemesan - SCROLLABLE ke bawah
               Expanded(
-                child: items.isEmpty
-                    ? const Center(child: Text('Pesanan kosong', style: TextStyle(color: AppColors.textMuted)))
-                    : ListView.separated(
-                        controller: scrollController,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        itemCount: items.length,
-                        separatorBuilder: (_, _) => const SizedBox(height: 8),
-                        itemBuilder: (_, idx) => _buildItemRow(items[idx], idx),
-                      ),
-              ),
-
-              // Detail Pemesan
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Divider(),
-                    const Text('Nama Pelanggan (Opsional)', style: TextStyle(fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _namaController,
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(color: AppColors.burgundy),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text('Catatan Pesanan (Opsional)', style: TextStyle(fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _catatanController,
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        hintText: 'Catatan pesanan',
-                        hintStyle: const TextStyle(
-                          color: AppColors.textMuted,
-                          fontSize: 13,
-                          fontWeight: FontWeight.normal,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(color: AppColors.burgundy),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text('Status Pembayaran', style: TextStyle(fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 8),
-                    Row(children: [
-                      _buildStatusChip('Belum Bayar (Catat)', 'belum'),
-                      const SizedBox(width: 8),
-                      _buildStatusChip('Sudah Bayar', 'lunas'),
-                    ]),
-                    if (_statusBayar == 'lunas') ...[
-                      const SizedBox(height: 16),
-                      const Text('Metode Bayar', style: TextStyle(fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 8),
-                      Row(children: [
-                        _buildMetodeChip('Tunai', 'tunai'),
-                        const SizedBox(width: 8),
-                        _buildMetodeChip('QRIS', 'qris'),
-                      ]),
-                    ],
-                  ],
-                ),
-              ),
-
-              // Total + Simpan
-              Padding(
-                padding: EdgeInsets.only(
-                  left: 16,
-                  right: 16,
-                  top: 12,
-                  bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Total', style: TextStyle(fontSize: 16)),
-                        Text(
-                          AppFormat.currency(_totalHarga),
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.burgundy),
+                        const Divider(),
+                        const Text('Nama Pelanggan (Opsional)', style: TextStyle(fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _namaController,
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: const BorderSide(color: AppColors.burgundy),
+                            ),
+                          ),
                         ),
+                        const SizedBox(height: 16),
+                        const Text('Catatan Pesanan (Opsional)', style: TextStyle(fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _catatanController,
+                          maxLines: 3,
+                          decoration: InputDecoration(
+                            hintText: 'Catatan pesanan',
+                            hintStyle: const TextStyle(
+                              color: AppColors.textMuted,
+                              fontSize: 13,
+                              fontWeight: FontWeight.normal,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: const BorderSide(color: AppColors.burgundy),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text('Status Pembayaran', style: TextStyle(fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 8),
+                        Row(children: [
+                          _buildStatusChip('Belum Bayar (Catat)', 'belum'),
+                          const SizedBox(width: 8),
+                          _buildStatusChip('Sudah Bayar', 'lunas'),
+                        ]),
+                        if (_statusBayar == 'lunas') ...[
+                          const SizedBox(height: 16),
+                          const Text('Metode Bayar', style: TextStyle(fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 8),
+                          Row(children: [
+                            _buildMetodeChip('Tunai', 'tunai'),
+                            const SizedBox(width: 8),
+                            _buildMetodeChip('QRIS', 'qris'),
+                          ]),
+                        ],
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Total', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            Text(
+                              AppFormat.currency(totalHarga),
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.burgundy),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: (items.isEmpty || _isLoading) ? null : _simpan,
+                          child: _isLoading
+                              ? const SizedBox(
+                                  width: 20, height: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.cream),
+                                )
+                              : Text(
+                                  widget.editMode ? 'Simpan Perubahan' : 'Simpan Transaksi',
+                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                        ),
+                        SizedBox(height: MediaQuery.of(context).viewInsets.bottom + 16),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: (items.isEmpty || _isLoading) ? null : _simpan,
-                      child: _isLoading
-                          ? const SizedBox(
-                              width: 20, height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.cream),
-                            )
-                          : Text(
-                              widget.editMode ? 'Simpan Perubahan' : 'Simpan Transaksi',
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ],
